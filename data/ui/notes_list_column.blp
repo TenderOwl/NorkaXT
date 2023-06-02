@@ -13,20 +13,22 @@ template $NotesListColumn : Box {
 
     styles ["flat"]
     
+    ToggleButton sidebar_btn {
+      icon-name: "sidebar-show-symbolic";
+    }
+    
+    MenuButton add_button {
+      icon-name: "list-add-symbolic";
+      tooltip-text: _("Add Feed/Category/Tag");
+    }
+    
     [title]
     Box {
       visible: false;
     }
     
-    ToggleButton show_sidebar_button {
-      visible: false;
-      receives-default: true;
-      icon-name: "view-sidebar-start-symbolic";
-    }
-    
     [end]
     ToggleButton search_button {
-      receives-default: true;
       tooltip-text: _("Search Notes");
       icon-name: "system-search-symbolic";
       active: bind-property search_bar.search-mode-enabled bidirectional;
