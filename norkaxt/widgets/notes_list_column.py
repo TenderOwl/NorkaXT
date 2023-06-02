@@ -22,15 +22,27 @@
 #
 # SPDX-License-Identifier: MIT
 
-from gi.repository import Adw
-from gi.repository import Gtk, Gdk
-
-from norkaxt.widgets.notes_list import NotesList
+from gi.repository import GObject
+from gi.repository import Gtk
 
 
 @Gtk.Template(resource_path='/com/tenderowl/norka/ui/notes_list_column.ui')
 class NotesListColumn(Gtk.Box):
     __gtype_name__ = 'NotesListColumn'
 
+    __gsignals__ = {
+        'toggle_sidebar': (
+            GObject.SignalFlags.RUN_LAST,
+            None,
+            (bool,)
+        )
+    }
+
+    sidebar_btn: Gtk.ToggleButton = Gtk.Template.Child()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+    @Gtk.Template.Callback
+    def on_sidebar_btn_toggled(self, btn: Gtk.ToggleButton, *_):
+        self.emit('toggle_sidebar', btn.activate)
