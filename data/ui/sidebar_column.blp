@@ -1,0 +1,60 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $SidebarColumn : Box {
+  name: "sidebar_column";
+  width-request: 220;
+  hexpand: true;
+  orientation: vertical;
+
+  Adw.HeaderBar headerbar {
+    show-start-title-buttons: true;
+    show-end-title-buttons: false;
+    styles ["flat"]
+
+    [title]
+    Box {
+      visible: false;
+    }
+
+    [end]
+    MenuButton menu_button {
+      receives-default: true;
+      icon-name: "open-menu-symbolic";
+      tooltip-text: _("Main Menu");
+      menu-model: primary_menu;
+    }
+
+    [end]
+    MenuButton add_button {
+      receives-default: true;
+      icon-name: "list-add-symbolic";
+      tooltip-text: _("Add Feed/Category/Tag");
+    }
+  }
+
+  $SideBar sidebar {
+    styles [
+      "navigation-sidebar",
+    ]
+  }
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: _("_Preferences");
+      action: "app.preferences";
+    }
+
+    item {
+      label: _("_Keyboard Shortcuts");
+      action: "win.show-help-overlay";
+    }
+
+    item {
+      label: _("_About NorkaXT");
+      action: "app.about";
+    }
+  }
+}

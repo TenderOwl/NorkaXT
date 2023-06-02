@@ -1,0 +1,43 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $NotesListColumn : Box {
+  name: "notes_list_column";
+  width-request: 360;
+  hexpand: true;
+  orientation: vertical;
+  
+  Adw.HeaderBar right_header {
+    show-start-title-buttons: false;
+    show-end-title-buttons: false;
+
+    styles ["flat"]
+    
+    [title]
+    Box {
+      visible: false;
+    }
+    
+    ToggleButton show_sidebar_button {
+      visible: false;
+      receives-default: true;
+      icon-name: "view-sidebar-start-symbolic";
+    }
+    
+    [end]
+    ToggleButton search_button {
+      receives-default: true;
+      tooltip-text: _("Search Notes");
+      icon-name: "system-search-symbolic";
+      active: bind-property search_bar.search-mode-enabled bidirectional;
+    }
+  }
+  
+  SearchBar search_bar {
+    SearchEntry search_entry {
+      hexpand: true;
+    }
+  }
+  
+  $NotesList notes_list {}
+}

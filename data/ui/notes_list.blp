@@ -1,0 +1,94 @@
+using Gtk 4.0;
+using Adw 1;
+using Gio 2.0;
+
+template $NotesList : Box {
+  orientation: vertical;
+  hexpand: true;
+  
+  ScrolledWindow {
+    vexpand: true;
+    
+    ListView listview {
+            single-click-activate: false;
+            show-separators: true;
+            enable-rubberband: false;
+            // model: SingleSelection selection {
+            //   autoselect: false;
+            //   model: SortListModel {
+            //     model: Gio.ListStore list_store {};
+            //     sorter: CustomSorter sorter {};
+            //   };
+            // };
+            // factory: SignalListItemFactory factory {};
+            model: SingleSelection {
+              model: StringList {
+                strings [ "Medium Stories", "Drafts for my final", "Diaries" ]
+              };
+            };
+            factory: BuilderListItemFactory {
+              template ListItem {
+                child: Box {
+                  hexpand: true;
+                  focusable: false;
+                  orientation: vertical;
+                  margin-end: 15;
+                  margin-start: 8;
+                  margin-bottom: 6;
+                  margin-top: 6;
+                  spacing: 4;
+
+                  Label title_label {
+                    vexpand: true;
+                    focusable: false;
+                    tooltip-text: _("title");
+                    // label: _("title");
+                    label: bind template.item as <StringObject>.string;
+                    wrap: true;
+                    wrap-mode: word_char;
+                    ellipsize: end;
+                    lines: 2;
+                    xalign: 0;
+                    yalign: 0.2;
+
+                    styles [
+                      "large",
+                    ]
+                  }
+
+                  Label summary_label {
+                    vexpand: true;
+                    focusable: false;
+                    margin-top: 5;
+                    // label: _("No Summary");
+                    label: bind template.item as <StringObject>.string;
+                    wrap: true;
+                    wrap-mode: word_char;
+                    ellipsize: end;
+                    lines: 1;
+                    xalign: 0;
+                    yalign: 0;
+
+                    styles [
+                      "subtitle",
+                    ]
+                  }
+                };
+              }
+            };
+
+            ShortcutController {
+              scope: local;
+
+              Shortcut down_shortcut {
+                trigger: "Down";
+              }
+
+              Shortcut up_shortcut {
+                trigger: "Up";
+              }
+            }
+          }
+
+  }
+}

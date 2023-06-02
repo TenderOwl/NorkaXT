@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/com/tenderowl/norka">
+    <file preprocess="xml-stripblanks">ui/window.ui</file>
+    <file preprocess="xml-stripblanks">ui/help-overlay.ui</file>
+    <file preprocess="xml-stripblanks">ui/content_page.ui</file>
+    <file preprocess="xml-stripblanks">ui/note_view_column.ui</file>
+    <file preprocess="xml-stripblanks">ui/notes_list_column.ui</file>
+    <file preprocess="xml-stripblanks">ui/sidebar.ui</file>
+    <file preprocess="xml-stripblanks">ui/sidebar_column.ui</file>
+    <file preprocess="xml-stripblanks">ui/folders_list.ui</file>
+    <file preprocess="xml-stripblanks">ui/notes_list.ui</file>
+    <file>styles.css</file>
+  </gresource>
+</gresources>

@@ -1,0 +1,21 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $NorkaxtWindow : Adw.ApplicationWindow {
+  default-width: 1200;
+  default-height: 720;
+
+  Box {
+    orientation: vertical;
+
+    Adw.Leaflet leaflet {
+      can-navigate-back: true;
+      can-unfold: false;
+      
+      Adw.LeafletPage {
+        name: "content_page";
+        child: $ContentPage content_page {};
+      }
+    }
+  }
+}

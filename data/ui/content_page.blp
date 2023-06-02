@@ -1,0 +1,41 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $ContentPage : Box {
+  Adw.ToastOverlay content_overlay {
+    Adw.Flap flap {
+      flap-position: start;
+      transition-type: under;
+      fold-threshold-policy: natural;
+      swipe-to-open: true;
+      swipe-to-close: true;
+      
+      [flap]
+      $SidebarColumn sidebar_column {
+        hexpand: "False";
+
+        styles [
+          "sidebar",
+        ]
+      }
+      
+      [content]
+      Adw.Leaflet leaflet {
+        fold-threshold-policy: minimum;
+        visible-child: note_view_column;
+        can-navigate-back: true;
+
+        $NotesListColumn notes_list_column {
+          hexpand: "False";
+        }
+
+        Adw.LeafletPage {
+          navigatable: false;
+          child: Separator separator {};
+        }
+
+        $NoteViewColumn note_view_column {}
+      }
+    }
+  }
+}

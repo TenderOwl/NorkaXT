@@ -1,0 +1,7 @@
+.idea
+.vscode
+
+.ruff_cache
+.flatpak-builder
+
+/subprojects/blueprint-compiler

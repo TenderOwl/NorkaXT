@@ -1,0 +1,31 @@
+using Gtk 4.0;
+
+template $FoldersList : Box {
+  orientation: vertical;
+
+  ListView folder_view {
+   vexpand: true;
+   styles ["navigation-sidebar"]
+    factory: BuilderListItemFactory {
+      template ListItem {
+        child: Box {
+          Image {
+            icon-name: "folder-symbolic";
+            margin-end: 8;
+          }
+
+          Label {
+            halign: start;
+            label: bind template.item as <StringObject>.string;
+          }
+        };
+      }
+    };
+
+      model: SingleSelection {
+        model: StringList {
+          strings [ "Medium Stories", "Drafts for my final", "Diaries" ]
+        };
+      };
+  }
+}

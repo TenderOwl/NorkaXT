@@ -1,0 +1,92 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $NoteViewColumn : Box {
+  orientation: vertical;
+  
+  Adw.HeaderBar {
+    width-request: 300;
+    hexpand: true;
+    show-start-title-buttons: false;
+    show-end-title-buttons: true;
+    
+    styles ["flat"]
+
+    [title]
+    Box {
+      visible: false;
+    }
+    
+    ToggleButton sidebar_btn {
+      icon-name: "sidebar-show-symbolic";
+    }
+    
+    Button back_button {
+      visible: false;
+      receives-default: true;
+
+      Image {
+        icon-name: "go-previous-symbolic";
+      }
+    }
+
+    [end]
+    ToggleButton search_btn {
+      icon-name: "system-search-symbolic";
+    }
+    
+    [end]
+    MenuButton tag_button {
+      sensitive: false;
+      receives-default: true;
+      valign: center;
+      icon-name: "tag-symbolic";
+      tooltip-text: _("Tag Article");
+
+      GestureClick tag_button_click {}
+    }
+
+    MenuButton enclosure_button {
+      visible: false;
+      receives-default: true;
+      valign: center;
+      icon-name: "mail-attachment-symbolic";
+      tooltip-text: _("Enclosures");
+    }
+
+    MenuButton share_button {
+      receives-default: true;
+      valign: center;
+      icon-name: "emblem-shared-symbolic";
+      tooltip-text: _("Share To");
+    }
+  }
+  
+  Overlay {
+    SearchBar search_bar {
+      hexpand: true;
+      styles ["flat"]
+
+      SearchEntry search_entry {}
+    }
+
+    ScrolledWindow {
+      vexpand: true;
+      hexpand: true;
+
+      TextView text_view {
+        css-name: "editor";
+        left-margin: 16;
+        right-margin: 16;
+        top-margin: 16;
+        bottom-margin: 16;
+        wrap-mode: word;
+        pixels-above-lines: 4;
+        pixels-below-lines: 4;
+        pixels-inside-wrap: 4;
+
+        buffer: TextBuffer buffer {};
+      }
+    }
+  }
+}

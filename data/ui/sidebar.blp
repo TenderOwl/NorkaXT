@@ -1,0 +1,120 @@
+using Gtk 4.0;
+
+template $SideBar : Box {
+  width-request: 200;
+  vexpand: true;
+  orientation: vertical;
+  can-focus: false;
+
+  DropControllerMotion drop_motion {}
+  GestureDrag drag_gesture {}
+
+  ScrolledWindow sidebar_scroll {
+    hexpand: true;
+    vexpand: true;
+    hscrollbar-policy: never;
+
+    Viewport {
+      Box {
+        orientation: vertical;
+
+        ListBox all_articles_fake_list {
+          margin-top: 10;
+          selection-mode: single;
+
+          ListBoxRow all_articles_row {
+            Box {
+              spacing: 2;
+
+              Image {
+                width-request: 24;
+                height-request: 24;
+                focusable: false;
+                icon-name: "format-justify-fill-symbolic";
+
+                styles [
+                  "symbolic",
+                ]
+              }
+
+              Label {
+                hexpand: true;
+                halign: start;
+                label: _("All Articles");
+
+                styles [
+                  "heading",
+                ]
+              }
+
+              Label item_count_all_label {
+                width-request: 24;
+                focusable: false;
+                valign: center;
+                label: _("0");
+
+                styles [
+                  "item-count",
+                ]
+              }
+            }
+          }
+
+          styles [
+            "navigation-sidebar",
+          ]
+        }
+
+        Box categories {
+          orientation: vertical;
+
+          Box categories_event_box {
+            height-request: 25;
+            margin-top: 15;
+            spacing: 5;
+
+            EventControllerMotion categories_motion {
+            }
+
+            GestureClick categories_click {
+              button: 1;
+            }
+
+            Label {
+              margin-start: 16;
+              focusable: false;
+              hexpand: true;
+              halign: start;
+              label: _("Categories");
+
+              styles [
+                "dim-label",
+                "caption-heading",
+              ]
+            }
+
+            [end]
+            Image categories_expander {
+              focusable: false;
+              width-request: 24;
+              height-request: 24;
+              margin-end: 13;
+              icon-name: "go-previous-symbolic";
+              opacity: 0.5;
+
+              styles [
+                "symbolic",
+                "backward-arrow-expanded",
+              ]
+            }
+          }
+
+          Revealer categories_revealer {
+            reveal-child: true;
+            child: $FoldersList folders_list {};
+          }
+        }
+      }
+    }
+  }
+}
