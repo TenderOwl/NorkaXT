@@ -4,6 +4,8 @@ NorkaXT is a reincarnation of the Norka text editor. As far as the first version
 was designed for elementary OS XT version is built upon modern UI and UX 
 practices.
 
+![App Window](data/screenshots/appwindow.png)
+
 ## About
 
 NorkaXT is a new and improved version of the Norka text editor, which was 
