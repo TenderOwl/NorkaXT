@@ -34,9 +34,12 @@ from norkaxt.widgets.sidebar_column import SidebarColumn
 class ContentPage(Gtk.Box):
     __gtype_name__ = 'ContentPage'
 
+    flap: Adw.Flap = Gtk.Template.Child()
     note_view_column: NoteViewColumn = Gtk.Template.Child()
     notes_list_column: NotesListColumn = Gtk.Template.Child()
     sidebar_column: SidebarColumn = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        self.notes_list_column.props.sidebar_toggled = self.flap.get_reveal_flap()

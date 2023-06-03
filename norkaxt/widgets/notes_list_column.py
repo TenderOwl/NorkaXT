@@ -25,24 +25,30 @@
 from gi.repository import GObject
 from gi.repository import Gtk
 
+from norkaxt.widgets.notes_list import NotesList
+
 
 @Gtk.Template(resource_path='/com/tenderowl/norka/ui/notes_list_column.ui')
 class NotesListColumn(Gtk.Box):
     __gtype_name__ = 'NotesListColumn'
 
     __gsignals__ = {
-        'toggle_sidebar': (
+        'sidebar_toggled': (
             GObject.SignalFlags.RUN_LAST,
             None,
             (bool,)
         )
     }
 
+    sidebar_toggled = GObject.Property(type=bool, default=True)
+    sidebar_toggle_visible = GObject.Property(type=bool, default=True)
+
     sidebar_btn: Gtk.ToggleButton = Gtk.Template.Child()
+    notes_list: NotesList = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-    @Gtk.Template.Callback
-    def on_sidebar_btn_toggled(self, btn: Gtk.ToggleButton, *_):
-        self.emit('toggle_sidebar', btn.activate)
+        self.bind_property('sidebar_toggled', self.sidebar_btn, 'active',
+                           GObject.BindingFlags.BIDIRECTIONAL)
+        self.bind_property('sidebar_toggle_visible', self.sidebar_btn, 'visible',
+                           GObject.BindingFlags.DEFAULT)

@@ -9,6 +9,7 @@ template $ContentPage : Box {
       fold-threshold-policy: natural;
       swipe-to-open: true;
       swipe-to-close: true;
+      reveal-flap: bind-property notes_list_column.sidebar_toggled bidirectional;
       
       [flap]
       $SidebarColumn sidebar_column {
@@ -25,9 +26,7 @@ template $ContentPage : Box {
         visible-child: note_view_column;
         can-navigate-back: true;
 
-        $NotesListColumn notes_list_column {
-          hexpand: "False";
-        }
+        $NotesListColumn notes_list_column {}
 
         Adw.LeafletPage {
           navigatable: false;
