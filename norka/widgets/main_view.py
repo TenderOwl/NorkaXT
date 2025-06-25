@@ -1,5 +1,3 @@
-#!@PYTHON@
-
 # MIT License
 #
 # Copyright (c) 2025 Andrey Maksimov
@@ -24,36 +22,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-import gettext
-import locale
-import os
-import signal
-import sys
+from gi.repository import Adw, Gtk
 
-import gi
 
-VERSION = "@VERSION@"
-pkgdatadir = "@pkgdatadir@"
-localedir = "@localedir@"
-PROFILE = "@PROFILE@"
-APP_ID = "@APP_ID@"
+@Gtk.Template(resource_path="/com/tenderowl/norka/ui/main_view.ui")
+class MainView(Adw.Bin):
+    __gtype_name__ = "MainView"
 
-gi.require_version("Gtk", "4.0")
-gi.require_version("Adw", "1")
-
-sys.path.insert(1, pkgdatadir)
-signal.signal(signal.SIGINT, signal.SIG_DFL)
-locale.bindtextdomain("norka", localedir)
-locale.textdomain("norka")
-gettext.install("norka", localedir)
-
-if __name__ == "__main__":
-    import gi
-    from gi.repository import Gio
-
-    resource = Gio.Resource.load(os.path.join(pkgdatadir, APP_ID + ".gresource"))
-    Gio.resources_register(resource)
-
-    from norka import main
-
-    sys.exit(main.main(VERSION, PROFILE))
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)

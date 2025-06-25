@@ -6,45 +6,31 @@ template $NorkaWindow: Adw.ApplicationWindow {
   default-width: 1200;
   default-height: 800;
 
-  Adw.ToastOverlay toast_overlay {
-    Adw.ToolbarView {
-      [top]
-      Adw.HeaderBar {
-        [end]
-        MenuButton {
-          primary: true;
-          icon-name: "open-menu-symbolic";
-          tooltip-text: _("Main Menu");
-          menu-model: primary_menu;
-        }
-      }
+  Adw.Breakpoint {
+    condition ("max-width: 600px")
 
-      content: Label label {
-        label: _("Hello, World!");
-
-        styles [
-          "title-1",
-        ]
-      };
+    setters {
+      split_view.collapsed: true;
     }
   }
-}
 
-menu primary_menu {
-  section {
-    item {
-      label: _("_Preferences");
-      action: "app.preferences";
-    }
+  Adw.ToastOverlay toast_overlay {
+    Adw.OverlaySplitView split_view {
+      [sidebar]
+      Adw.NavigationPage {
+        title: 'Norka';
+        name: 'sidebar';
 
-    item {
-      label: _("_Keyboard Shortcuts");
-      action: "win.show-help-overlay";
-    }
+        $Sidebar sidebar {}
+      }
 
-    item {
-      label: _("_About NorkaXT");
-      action: "app.about";
+      [content]
+      Adw.NavigationPage {
+        title: _("Main View");
+        name: "main-view";
+
+        $MainView main_view {}
+      }
     }
   }
 }

@@ -22,14 +22,23 @@
 #
 # SPDX-License-Identifier: MIT
 
-from gi.repository import Adw
-from gi.repository import Gtk
+from gi.repository import Adw, Gtk
 
-@Gtk.Template(resource_path='/com/tenderowl/norka/ui/window.ui')
+from norka.widgets.main_view import MainView
+from norka.widgets.sidebar import Sidebar
+
+
+@Gtk.Template(resource_path="/com/tenderowl/norka/ui/window.ui")
 class NorkaWindow(Adw.ApplicationWindow):
-    __gtype_name__ = 'NorkaWindow'
+    __gtype_name__ = "NorkaWindow"
 
-    label = Gtk.Template.Child()
+    toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
+    sidebar: Sidebar = Gtk.Template.Child()
+    main_view: MainView = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+    def add_toast(self, toast: Adw.Toast):
+        self.toast_overlay.add_toast(toast)
+        self.toast_overlay.show_all()

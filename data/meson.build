@@ -2,6 +2,8 @@ blueprints = custom_target('blueprints',
   input: files(
     'ui/help-overlay.blp',
     'ui/window.blp',
+    'ui/sidebar.blp',
+    'ui/main_view.blp',
   ),
   output: '.',
   command: [find_program('blueprint-compiler'), 'batch-compile', '@OUTPUT@', '@CURRENT_SOURCE_DIR@', '@INPUT@'],

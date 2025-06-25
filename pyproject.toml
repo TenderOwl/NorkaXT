@@ -4,5 +4,6 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.13"
 dependencies = [
+    "pygobject>=3.52.3",
     "ruff>=0.12.0",
 ]

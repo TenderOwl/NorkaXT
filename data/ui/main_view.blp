@@ -1,0 +1,20 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $MainView : Adw.Bin {
+
+  Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {
+      show-title: false;
+    }
+
+    content:  Label {
+      label: _("Main View");
+
+      styles [
+        "title-1",
+      ]
+    };
+  }
+}
