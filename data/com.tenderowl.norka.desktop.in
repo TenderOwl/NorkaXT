@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=norka
+Exec=norka
+Icon=com.tenderowl.norka
+Terminal=false
+Type=Application
+Categories=Utility;
+Keywords=GTK;
+StartupNotify=true
+DBusActivatable=true

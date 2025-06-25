@@ -1,0 +1,8 @@
+# List of source files containing translatable strings.
+# Please keep this file sorted alphabetically.
+data/com.tenderowl.norka.desktop.in
+data/com.tenderowl.norka.metainfo.xml.in
+data/com.tenderowl.norka.gschema.xml
+src/main.py
+src/window.py
+src/window.ui

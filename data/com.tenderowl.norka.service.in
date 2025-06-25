@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=com.tenderowl.norka
+Exec=@bindir@/norka --gapplication-service

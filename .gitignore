@@ -1,0 +1,6 @@
+.idea
+
+/subprojects/blueprint-compiler
+
+.pyc
+.pyo
