@@ -1,0 +1,18 @@
+using Gtk 4.0;
+
+
+template $WorkspaceView : Box {
+  orientation: vertical;
+
+  FlowBox flowbox {
+    column-spacing: 12;
+    row-spacing: 12;
+    margin-end: 12;
+    margin-top: 12;
+    margin-start: 12;
+    margin-bottom: 12;
+
+    activate-on-single-click: true;
+    child-activated => $_on_flowbox_child_activated();
+  }
+}

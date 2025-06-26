@@ -21,36 +21,43 @@
 # SOFTWARE.
 #
 # SPDX-License-Identifier: MIT
-from typing import List
 
-from gi.repository import Adw, GObject, Gtk
+from gi.repository import GObject, Gtk
 
-from norka.models import Workspace
+from norka.models.workspace import Workspace
 
 
-@Gtk.Template(resource_path="/com/tenderowl/norka/ui/main_view.ui")
-class MainView(Adw.Bin):
-    __gtype_name__ = "MainView"
+@Gtk.Template(resource_path="/com/tenderowl/norka/ui/workspace_card.ui")
+class WorkspaceCard(Gtk.Box):
+    __gtype_name__ = "WorkspaceCard"
 
-    _workspaces: List[Workspace] = []
+    _workspace: Workspace | None = None
 
-    flow_box: Gtk.FlowBox = Gtk.Template.Child()
+    cover: Gtk.Image = Gtk.Template.Child()
+    icon: Gtk.Label = Gtk.Template.Child()
+    title: Gtk.Label = Gtk.Template.Child()
+    updated_at: Gtk.Label = Gtk.Template.Child()
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, workspace: Workspace = None):
+        super().__init__()
+        self._workspace = workspace
+
+        print("workspace:", workspace)
+        if workspace:
+            self._bind_workspace(workspace)
 
     @GObject.Property
-    def workspaces(self) -> List[Workspace]:
-        return self._workspaces
+    def workspace(self) -> Workspace | None:
+        return self._workspace
 
-    @workspaces.setter
-    def workspaces(self, value: List[Workspace] | None):
-        self._workspaces = value or []
+    @workspace.setter
+    def workspace(self, workspace: Workspace):
+        self._workspace = workspace
 
-        for workspace in self._workspaces:
-            self.flow_box.append(self._new_flow_box_item(workspace))
-
-    def _new_flow_box_item(self, workspace: Workspace):
-        flow_box_item = Gtk.FlowBoxChild()
-        flow_box_item.set_child(Gtk.Label(label=workspace.name))
-        return flow_box_item
+    def _bind_workspace(self, workspace: Workspace):
+        if workspace.icon:
+            self.icon.set_label(workspace.icon)
+        else:
+            self.icon.set_visible(False)
+        self.title.set_label(workspace.name)
+        self.updated_at.set_label(f"{workspace.last_accessed}")

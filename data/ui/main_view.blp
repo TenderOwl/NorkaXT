@@ -7,14 +7,19 @@ template $MainView : Adw.Bin {
     [top]
     Adw.HeaderBar {
       show-title: false;
+
+      [start]
+      Button {
+        icon-name: 'list-add-symbolic';
+        clicked => $_on_add_btn_clicked();
+      }
     }
 
-    content:  Label {
-      label: _("Main View");
 
-      styles [
-        "title-1",
-      ]
-    };
+    Adw.Clamp {
+
+      FlowBox flow_box {
+      }
+    }
   }
 }

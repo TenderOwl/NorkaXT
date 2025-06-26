@@ -1,0 +1,39 @@
+using Gtk 4.0;
+
+
+template $WorkspaceCard : Box {
+  orientation: vertical;
+  height-request: 120;
+  width-request: 180;
+  styles ["card"]
+
+  Image cover {
+    height-request: 80;
+  }
+
+  Box {
+    spacing: 6;
+    margin-start: 6;
+    margin-bottom: 6;
+    margin-end: 6;
+
+    Label icon {
+      width-request: 32;
+    }
+
+    Label title {
+      ellipsize: end;
+      tooltip-text: bind title.label;
+      styles ["heading"]
+    }
+  }
+
+  Label updated_at {
+    xalign: 0;
+    margin-start: 6;
+    margin-bottom: 6;
+    margin-end: 6;
+    styles ["caption"]
+  }
+
+}

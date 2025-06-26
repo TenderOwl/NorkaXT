@@ -15,21 +15,43 @@ template $NorkaWindow: Adw.ApplicationWindow {
   }
 
   Adw.ToastOverlay toast_overlay {
-    Adw.OverlaySplitView split_view {
-      [sidebar]
-      Adw.NavigationPage {
-        title: 'Norka';
-        name: 'sidebar';
 
-        $Sidebar sidebar {}
+    Stack screens {
+      transition-type: crossfade;
+      transition-duration: 150;
+
+      StackPage {
+        name: "workspaces-view";
+
+        child: Adw.ToolbarView {
+           [top]
+           Adw.HeaderBar {
+           }
+
+           $WorkspaceView workspace_view {}
+       };
       }
 
-      [content]
-      Adw.NavigationPage {
-        title: _("Main View");
+      StackPage {
         name: "main-view";
 
-        $MainView main_view {}
+        child: Adw.OverlaySplitView split_view {
+          [sidebar]
+          Adw.NavigationPage {
+            title: 'Norka';
+            name: 'sidebar';
+
+            $Sidebar sidebar {}
+          }
+
+          [content]
+          Adw.NavigationPage {
+            title: _("Main View");
+            name: "main-view";
+
+            $MainView main_view {}
+          }
+        };
       }
     }
   }

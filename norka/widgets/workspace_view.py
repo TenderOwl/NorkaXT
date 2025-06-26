@@ -23,34 +23,42 @@
 # SPDX-License-Identifier: MIT
 from typing import List
 
-from gi.repository import Adw, GObject, Gtk
+from gi.repository import GObject, Gtk
 
-from norka.models import Workspace
+from norka.models.workspace import Workspace
+from norka.widgets.workspace_card import WorkspaceCard
 
 
-@Gtk.Template(resource_path="/com/tenderowl/norka/ui/main_view.ui")
-class MainView(Adw.Bin):
-    __gtype_name__ = "MainView"
+@Gtk.Template(resource_path="/com/tenderowl/norka/ui/workspace_view.ui")
+class WorkspaceView(Gtk.Box):
+    __gtype_name__ = "WorkspaceView"
 
-    _workspaces: List[Workspace] = []
+    _workspaces: List[Workspace]
 
-    flow_box: Gtk.FlowBox = Gtk.Template.Child()
+    flow_box: Gtk.FlowBox = Gtk.Template.Child(name="flowbox")
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, workspaces: List[Workspace] = None):
+        super().__init__()
+        self._workspaces = workspaces or []
 
     @GObject.Property
     def workspaces(self) -> List[Workspace]:
         return self._workspaces
 
     @workspaces.setter
-    def workspaces(self, value: List[Workspace] | None):
-        self._workspaces = value or []
+    def workspaces(self, workspaces: List[Workspace]):
+        self._workspaces = workspaces
 
+        self.flow_box.remove_all()
         for workspace in self._workspaces:
-            self.flow_box.append(self._new_flow_box_item(workspace))
+            self.flow_box.append(self._new_item(workspace))
 
-    def _new_flow_box_item(self, workspace: Workspace):
-        flow_box_item = Gtk.FlowBoxChild()
-        flow_box_item.set_child(Gtk.Label(label=workspace.name))
-        return flow_box_item
+    def _new_item(self, workspace: Workspace) -> Gtk.FlowBoxChild:
+        child = WorkspaceCard(workspace=workspace)
+        return Gtk.FlowBoxChild(child=child)
+
+    @Gtk.Template.Callback
+    def _on_flowbox_child_activated(self, flow_box: Gtk.FlowBox, child: Gtk.FlowBoxChild):
+        workspace = child.get_child().workspace
+        print("workspace selected:", workspace)
+        self.emit("workspace-selected", workspace)

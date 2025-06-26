@@ -25,6 +25,18 @@
     "modules" : [
     	"blueprint-compiler.json",
         {
+            "name": "gom",
+            "buildsystem": "meson",
+            "cleanup": ["*"],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://gitlab.gnome.org/GNOME/gom",
+                    "branch": "master"
+                }
+            ]
+        },
+        {
             "name" : "norkaxt",
             "builddir" : true,
             "buildsystem" : "meson",
