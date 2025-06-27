@@ -1,18 +1,49 @@
 using Gtk 4.0;
-
+using Adw 1;
+using Gio 2.0;
+using GObject 2.0;
 
 template $WorkspaceView : Box {
   orientation: vertical;
 
-  FlowBox flowbox {
-    column-spacing: 12;
-    row-spacing: 12;
-    margin-end: 12;
-    margin-top: 12;
-    margin-start: 12;
-    margin-bottom: 12;
+  Stack screens {
+    vexpand: true;
 
-    activate-on-single-click: true;
-    child-activated => $_on_flowbox_child_activated();
+    StackPage {
+      name: "empty-view";
+
+      child: Adw.StatusPage {
+        icon-name: "com.tenderowl.norka";
+        title: _("Create a Workspace");
+      };
+    }
+
+    StackPage {
+      name: "content-view";
+
+      child: Adw.Clamp {
+        maximum-size: 1200;
+
+        GridView grid_view {
+          max-columns: 4;
+
+          margin-end: 12;
+          margin-top: 12;
+          margin-start: 12;
+          margin-bottom: 12;
+
+          model: NoSelection selection_model {
+            model: Gio.ListStore workspaces_store {
+              item-type: typeof<GObject.Object>;
+            };
+          };
+
+          factory: SignalListItemFactory {
+            bind => $_on_item_bind();
+            setup => $_on_item_setup();
+          };
+        }
+      };
+    }
   }
 }

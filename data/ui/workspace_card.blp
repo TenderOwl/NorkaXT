@@ -3,19 +3,27 @@ using Gtk 4.0;
 
 template $WorkspaceCard : Box {
   orientation: vertical;
-  height-request: 120;
-  width-request: 180;
   styles ["card"]
+  margin-start: 6;
+  margin-end: 6;
+  margin-bottom: 6;
+  margin-top: 6;
 
-  Image cover {
-    height-request: 80;
+  Picture cover {
+    content-fit: cover;
+    halign: center;
+    valign: center;
+    can-shrink: true;
+    height-request: 100;
+    styles ["card", "inline"]
   }
 
   Box {
     spacing: 6;
     margin-start: 6;
-    margin-bottom: 6;
     margin-end: 6;
+    margin-bottom: 8;
+    margin-top: 8;
 
     Label icon {
       width-request: 32;
@@ -30,10 +38,24 @@ template $WorkspaceCard : Box {
 
   Label updated_at {
     xalign: 0;
-    margin-start: 6;
-    margin-bottom: 6;
-    margin-end: 6;
+    margin-start: 8;
+    margin-bottom: 8;
+    margin-end: 8;
     styles ["caption"]
   }
 
+  GestureClick {
+    button: 3;
+    pressed => $_on_context_menu();
+  }
+}
+
+menu edit_menu {
+  section {
+    item (_("Favorite"), "action-name", "non-starred-symbolic")
+    item (_("Edit"), "action-name", "icon-name")
+  }
+  section {
+    item (_("Delete"), "delete-workspace", "icon-name")
+  }
 }

@@ -23,10 +23,13 @@
 # SPDX-License-Identifier: MIT
 from typing import List
 
-from gi.repository import GObject, Gtk
+from gi.repository import Gio, GObject, Gtk
 
 from norka.models.workspace import Workspace
 from norka.widgets.workspace_card import WorkspaceCard
+
+EMPTY_STACK_PAGE = "empty-view"
+CONTENT_STACK_PAGE = "content-view"
 
 
 @Gtk.Template(resource_path="/com/tenderowl/norka/ui/workspace_view.ui")
@@ -35,11 +38,16 @@ class WorkspaceView(Gtk.Box):
 
     _workspaces: List[Workspace]
 
-    flow_box: Gtk.FlowBox = Gtk.Template.Child(name="flowbox")
+    screens: Gtk.Stack = Gtk.Template.Child()
+    grid_view: Gtk.GridView = Gtk.Template.Child(name="grid_view")
+    selection_model: Gtk.NoSelection = Gtk.Template.Child()
+    workspaces_store: Gio.ListStore = Gtk.Template.Child()
 
     def __init__(self, workspaces: List[Workspace] = None):
         super().__init__()
         self._workspaces = workspaces or []
+
+        self.grid_view.remove_css_class("view")
 
     @GObject.Property
     def workspaces(self) -> List[Workspace]:
@@ -49,16 +57,21 @@ class WorkspaceView(Gtk.Box):
     def workspaces(self, workspaces: List[Workspace]):
         self._workspaces = workspaces
 
-        self.flow_box.remove_all()
+        if not self._workspaces:
+            self.screens.set_visible_child_name(EMPTY_STACK_PAGE)
+        else:
+            self.screens.set_visible_child_name(CONTENT_STACK_PAGE)
+
+        self.workspaces_store.remove_all()
         for workspace in self._workspaces:
-            self.flow_box.append(self._new_item(workspace))
+            self.workspaces_store.append(workspace)
 
-    def _new_item(self, workspace: Workspace) -> Gtk.FlowBoxChild:
-        child = WorkspaceCard(workspace=workspace)
-        return Gtk.FlowBoxChild(child=child)
+    @Gtk.Template.Callback()
+    def _on_item_setup(self, factory: Gtk.ListItemFactory, list_item: Gtk.ListItem):
+        list_item.set_child(WorkspaceCard())
 
-    @Gtk.Template.Callback
-    def _on_flowbox_child_activated(self, flow_box: Gtk.FlowBox, child: Gtk.FlowBoxChild):
-        workspace = child.get_child().workspace
-        print("workspace selected:", workspace)
-        self.emit("workspace-selected", workspace)
+    @Gtk.Template.Callback()
+    def _on_item_bind(self, factory: Gtk.ListItemFactory, list_item: Gtk.ListItem):
+        item = list_item.get_item()
+        workspace_card = list_item.get_child()
+        workspace_card.workspace = item

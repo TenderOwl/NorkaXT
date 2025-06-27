@@ -21,22 +21,40 @@
 # SOFTWARE.
 #
 # SPDX-License-Identifier: MIT
-from typing import Optional
+from typing import Optional, Self
 
 from gi.repository import GObject, Gom
 
-from norka.models import DatabaseManager, Workspace
+from norka.models import DatabaseManager, Workspace, get_database_manager
+
+# Global database manager instance
+_db_manager: DatabaseManager | None = None
 
 
 class WorkspaceService(GObject.Object):
     __gtype_name__ = "WorkspaceService"
 
+    _service: Self | None = None
+
+    __gsignals__ = {
+        "workspace-created": (GObject.SIGNAL_RUN_FIRST, None, (Workspace,)),
+        "workspace-updated": (GObject.SIGNAL_RUN_FIRST, None, (Workspace,)),
+        "workspace-deleted": (GObject.SIGNAL_RUN_FIRST, None, (Workspace, bool)),
+    }
+
     def __init__(self, database: DatabaseManager, **kwargs):
         super().__init__(**kwargs)
         self._database = database
+        print("WorkspaceService initialized with database", database.database_path)
+
+    @classmethod
+    def get_default(cls) -> Self:
+        if cls._service is None:
+            cls._service = cls(database=get_database_manager())
+        return cls._service
 
     def create_workspace(
-        self, name: str, description: str = None, path: str = None
+        self, name: str, description: str = None, cover: str = None, icon: str = None
     ) -> Workspace:
         """
         Create a new workspace.
@@ -44,17 +62,20 @@ class WorkspaceService(GObject.Object):
         Args:
             name: Workspace name
             description: Optional description
-            path: Optional filesystem path
+            cover: Optional filesystem path
+            icon: Optional workspace icon
 
         Returns:
             Created workspace
         """
-        workspace = Workspace.create(self._database.repository, name, description, path)
-        self._session.add(workspace)
-        self._session.commit()
+        workspace = Workspace.create(
+            name, description, cover, icon, repository=self._database.repository
+        )
+        workspace.save_sync()
+        self.emit("workspace-created", workspace)
         return workspace
 
-    def get_workspace(self, workspace_id: int) -> Optional[Workspace]:
+    def get_workspace(self, workspace_id: str) -> Optional[Workspace]:
         """
         Get workspace by ID.
 
@@ -64,9 +85,8 @@ class WorkspaceService(GObject.Object):
         Returns:
             Workspace or None if not found
         """
-        return (
-            self._session.query(Workspace).filter(Workspace.id == workspace_id).first()
-        )
+        filter = Gom.Filter.new_eq(Workspace, "id", workspace_id)
+        return self._database.repository.find_one_sync(Workspace, filter)
 
     def get_workspace_by_name(self, name: str) -> Optional[Workspace]:
         """
@@ -118,20 +138,22 @@ class WorkspaceService(GObject.Object):
             List of all workspaces
         """
         sorting = Gom.Sorting(Workspace, "name", Gom.SortingMode.DESCENDING)
-        group = self._database._repository.find_sorted_sync(Workspace, None, sorting)
+        group = self._database.repository.find_sorted_sync(Workspace, None, sorting)
         count = len(group)
         group.fetch_sync(0, count)
         return list(group)
 
-    def delete_workspace(self, workspace: Workspace):
+    def delete_workspace(self, workspace_id: str) -> bool:
         """
         Delete a workspace.
 
         Args:
             workspace: Workspace to delete
         """
-        self._session.delete(workspace)
-        self._session.commit()
+        workspace = self.get_workspace(workspace_id)
+        result = workspace.delete_sync()
+        self.emit("workspace-deleted", workspace, result)
+        return result
 
     def activate_workspace(self, workspace: Workspace):
         """

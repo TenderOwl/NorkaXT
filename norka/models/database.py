@@ -25,7 +25,7 @@
 from pathlib import Path
 from typing import Optional
 
-from gi.repository import GLib, Gom
+from gi.repository import GLib, GObject, Gom
 
 from .workspace import Workspace
 
@@ -40,6 +40,8 @@ class DatabaseManager:
 
     _repository: Gom.Repository | None = None
     _adapter: Gom.Adapter | None = None
+
+    _database_path: str
 
     def __init__(self, database_path: Optional[str] = None):
         """
@@ -68,6 +70,10 @@ class DatabaseManager:
         self._repository = Gom.Repository(adapter=self._adapter)
         self._repository.automatic_migrate_sync(1, [Workspace])
 
+    @property
+    def database_path(self):
+        return self._database_path
+
     def close(self):
         """Close the database connection."""
         self._adapter.close_sync()
@@ -88,6 +94,10 @@ class DatabaseManager:
     def rollback(self):
         """Rollback pending changes."""
         self._repository.rollback()
+
+    @GObject.Property()
+    def repository(self):
+        return self._repository
 
 
 # Global database manager instance

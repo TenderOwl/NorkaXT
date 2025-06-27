@@ -24,6 +24,7 @@
     ],
     "modules" : [
     	"blueprint-compiler.json",
+        "python3-modules.json",
         {
             "name": "gom",
             "buildsystem": "meson",

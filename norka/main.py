@@ -25,13 +25,16 @@
 import sys
 from gettext import gettext as _
 
-from gi.repository import Adw, Gio
+from gi.repository import Adw, Gio, GLib
 
+from norka.models.workspace_service import WorkspaceService
 from norka.window import NorkaWindow
 
 
 class NorkaApplication(Adw.Application):
     """The main application singleton class."""
+
+    _workspace_service: WorkspaceService | None = None
 
     def __init__(self, version: str, profile: str):
         super().__init__(
@@ -39,9 +42,15 @@ class NorkaApplication(Adw.Application):
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
             resource_base_path="/com/tenderowl/norka",
         )
+
         self.create_action("quit", lambda *_: self.quit(), ["<primary>q"])
         self.create_action("about", self.on_about_action)
         self.create_action("preferences", self.on_preferences_action)
+        self.create_action(
+            "delete-workspace",
+            self.on_delete_workspace_action,
+            parameter_type=GLib.VariantType.new("s"),
+        )
 
     def do_activate(self):
         """Called when the application is activated.
@@ -54,10 +63,14 @@ class NorkaApplication(Adw.Application):
             win = NorkaWindow(application=self)
         win.present()
 
+    def do_startup(self):
+        Adw.Application.do_startup(self)
+        self._workspace_service = WorkspaceService.get_default()
+
     def on_about_action(self, *args):
         """Callback for the app.about action."""
         about = Adw.AboutDialog(
-            application_name="norkaxt",
+            application_name="norka",
             application_icon="com.tenderowl.norka",
             developer_name="Andrey Maksimov",
             version="0.1.0",
@@ -72,7 +85,12 @@ class NorkaApplication(Adw.Application):
         """Callback for the app.preferences action."""
         print("app.preferences action activated")
 
-    def create_action(self, name, callback, shortcuts=None):
+    def on_delete_workspace_action(self, action, param: GLib.Variant):
+        workspace_id = param.get_string()
+        print(f"delete workspace {workspace_id}")
+        GLib.idle_add(self._workspace_service.delete_workspace, workspace_id)
+
+    def create_action(self, name, callback, shortcuts=None, parameter_type=None):
         """Add an application action.
 
         Args:
@@ -80,8 +98,9 @@ class NorkaApplication(Adw.Application):
             callback: the function to be called when the action is
               activated
             shortcuts: an optional list of accelerators
+            parameter_type: an optional action's parameter type
         """
-        action = Gio.SimpleAction.new(name, None)
+        action = Gio.SimpleAction.new(name, parameter_type)
         action.connect("activate", callback)
         self.add_action(action)
         if shortcuts:

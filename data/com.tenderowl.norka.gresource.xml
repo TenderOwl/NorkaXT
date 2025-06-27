@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/com/tenderowl/norka">
-    <file preprocess="xml-stripblanks">ui/window.ui</file>
-    <file preprocess="xml-stripblanks">ui/help-overlay.ui</file>
-    <file preprocess="xml-stripblanks">ui/main_view.ui</file>
-    <file preprocess="xml-stripblanks">ui/sidebar.ui</file>
-    <file preprocess="xml-stripblanks">ui/workspace_view.ui</file>
-    <file preprocess="xml-stripblanks">ui/workspace_card.ui</file>
-  </gresource>
+    <gresource prefix="/com/tenderowl/norka">
+        <file preprocess="xml-stripblanks">ui/window.ui</file>
+        <file preprocess="xml-stripblanks">ui/help-overlay.ui</file>
+        <file preprocess="xml-stripblanks">ui/main_view.ui</file>
+        <file preprocess="xml-stripblanks">ui/sidebar.ui</file>
+        <file preprocess="xml-stripblanks">ui/workspace_view.ui</file>
+        <file preprocess="xml-stripblanks">ui/workspace_card.ui</file>
+        <file preprocess="xml-stripblanks">ui/add_workspace_dialog.ui</file>
+    </gresource>
+    <gresource prefix="/com/tenderowl/norka/covers">
+        <file alias="cover-1">covers/cover-1.jpg</file>
+        <file alias="cover-2">covers/cover-2.jpg</file>
+        <file alias="cover-3">covers/cover-3.jpg</file>
+        <file alias="cover-4">covers/cover-4.jpg</file>
+        <file alias="cover-5">covers/cover-5.jpg</file>
+        <file alias="cover-6">covers/cover-6.jpg</file>
+        <file alias="cover-7">covers/cover-7.jpg</file>
+        <file alias="cover-8">covers/cover-8.jpg</file>
+    </gresource>
 </gresources>

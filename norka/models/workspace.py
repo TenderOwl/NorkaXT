@@ -26,6 +26,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Optional
 
+import nanoid
+from gi.module import repository
 from gi.repository import GObject, Gom
 from gi.types import GObjectMeta
 
@@ -33,7 +35,7 @@ from gi.types import GObjectMeta
 class WorkspaceResourceMeta(GObjectMeta):
     def __init__(self, name, bases, dct):
         super().__init__(name, bases, dct)
-        self.set_table("items")
+        self.set_table("workspaces")
         self.set_primary_key("id")
         self.set_notnull("name")
 
@@ -45,9 +47,6 @@ class Workspace(Gom.Resource, metaclass=WorkspaceResourceMeta):
     A workspace contains multiple documents, workspace-specific settings,
     and metadata about the working environment.
     """
-
-    # GOM resource table name
-    __gom_table_name__ = "workspaces"
 
     # GOM resource primary key
     id: str = GObject.Property(type=str)
@@ -67,8 +66,9 @@ class Workspace(Gom.Resource, metaclass=WorkspaceResourceMeta):
 
     def __init__(self, **kwargs):
         """Initialize a new workspace."""
-        super().__init__()
+        super().__init__(repository=kwargs.get("repository", None))
 
+        self.id = kwargs.get("id", nanoid.generate())
         # Initialize properties with defaults
         self.name = kwargs.get("name", "")
         self.description = kwargs.get("description", None)
@@ -115,9 +115,18 @@ class Workspace(Gom.Resource, metaclass=WorkspaceResourceMeta):
         """Handle workspace access updates."""
         self.emit("workspace-accessed")
 
+    @property
+    def last_accessed_dt(self) -> datetime:
+        return datetime.fromtimestamp(self.last_accessed)
+
     @classmethod
     def create(
-        cls, name: str, description: str = None, path: str = None
+        cls,
+        name: str,
+        description: str = None,
+        path: str = None,
+        icon: str = None,
+        repository=None,
     ) -> "Workspace":
         """
         Create a new workspace.
@@ -126,11 +135,15 @@ class Workspace(Gom.Resource, metaclass=WorkspaceResourceMeta):
             name: The workspace name
             description: Optional description
             path: Optional filesystem path
+            icon: Optional workspace icon
+            repository: Optional repository
 
         Returns:
             New Workspace instance
         """
-        workspace = cls(name=name, description=description, path=path)
+        workspace = cls(name=name, description=description, path=path, icon=icon, repository=repository)
+        workspace.created_at = int(datetime.now().timestamp())
+        workspace.updated_at = workspace.created_at
         return workspace
 
     @classmethod

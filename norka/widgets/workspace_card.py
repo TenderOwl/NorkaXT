@@ -22,7 +22,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-from gi.repository import GObject, Gtk
+import humanize
+from gi.repository import Gio, GLib, GObject, Gtk
 
 from norka.models.workspace import Workspace
 
@@ -31,20 +32,34 @@ from norka.models.workspace import Workspace
 class WorkspaceCard(Gtk.Box):
     __gtype_name__ = "WorkspaceCard"
 
+    __gsignals__ = {
+        "edit-workspace": (GObject.SIGNAL_RUN_FIRST, None, (Workspace,)),
+        "delete-workspace": (GObject.SIGNAL_RUN_FIRST, None, (Workspace,)),
+        "favorite-workspace": (GObject.SIGNAL_RUN_FIRST, None, (Workspace, bool)),
+    }
+
     _workspace: Workspace | None = None
 
-    cover: Gtk.Image = Gtk.Template.Child()
+    cover: Gtk.Picture = Gtk.Template.Child()
     icon: Gtk.Label = Gtk.Template.Child()
     title: Gtk.Label = Gtk.Template.Child()
     updated_at: Gtk.Label = Gtk.Template.Child()
+    edit_menu: Gio.MenuModel = Gtk.Template.Child()
 
     def __init__(self, workspace: Workspace = None):
         super().__init__()
         self._workspace = workspace
 
-        print("workspace:", workspace)
+        self.popover = Gtk.PopoverMenu(
+            position=Gtk.PositionType.RIGHT,
+            menu_model=self.edit_menu,
+        )
+        self.popover.set_parent(self)
+
         if workspace:
             self._bind_workspace(workspace)
+
+        self.install_action("delete-workspace", None, self._on_delete_workspace)
 
     @GObject.Property
     def workspace(self) -> Workspace | None:
@@ -53,11 +68,34 @@ class WorkspaceCard(Gtk.Box):
     @workspace.setter
     def workspace(self, workspace: Workspace):
         self._workspace = workspace
+        self._bind_workspace(workspace)
 
     def _bind_workspace(self, workspace: Workspace):
+        print("bind workspace:", workspace)
+        workspace.cover = workspace.cover or "cover-1"
+        self.cover.set_resource(f"/com/tenderowl/norka/covers/{workspace.cover}")
+
         if workspace.icon:
             self.icon.set_label(workspace.icon)
         else:
             self.icon.set_visible(False)
         self.title.set_label(workspace.name)
-        self.updated_at.set_label(f"{workspace.last_accessed}")
+        self.updated_at.set_label(humanize.naturaldate(workspace.last_accessed_dt))
+
+    @Gtk.Template.Callback()
+    def _on_context_menu(self, controller, button, x, y):
+        self.popover.popup()
+
+    def _on_edit_workspace(self, sender, action: str, args=None):
+        print(f"{action}: {self._workspace}")
+        if self._workspace:
+            self.activate_action(
+                "app.edit-workspace", GLib.Variant.new_string(self._workspace.id)
+            )
+
+    def _on_delete_workspace(self, sender, action: str, args=None):
+        print(f"{action}: {self._workspace}")
+        if self._workspace:
+            self.activate_action(
+                "app.delete-workspace", GLib.Variant.new_string(self._workspace.id)
+            )
