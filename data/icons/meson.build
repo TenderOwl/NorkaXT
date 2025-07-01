@@ -1,13 +1,11 @@
-application_id = 'com.tenderowl.norka'
-
-scalable_dir = 'hicolor' / 'scalable' / 'apps'
+dir_48 = join_paths('hicolor', '48x48', 'apps')
 install_data(
-  scalable_dir / ('@0@.svg').format(application_id),
-  install_dir: get_option('datadir') / 'icons' / scalable_dir
+  join_paths(dir_48, ('@0@.png').format(app_id)),
+  install_dir: join_paths(get_option('datadir'), 'icons', dir_48)
 )
 
-symbolic_dir = 'hicolor' / 'symbolic' / 'apps'
+dir_256 = join_paths('hicolor', '256x256', 'apps')
 install_data(
-  symbolic_dir / ('@0@-symbolic.svg').format(application_id),
-  install_dir: get_option('datadir') / 'icons' / symbolic_dir
+  join_paths(dir_256, ('@0@.png').format(app_id)),
+  install_dir: join_paths(get_option('datadir'), 'icons', dir_256)
 )
