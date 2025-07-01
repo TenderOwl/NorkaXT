@@ -82,7 +82,7 @@ class NorkaApplication(Adw.Application):
             application_name="norka",
             application_icon="com.tenderowl.norka",
             developer_name="Andrey Maksimov",
-            version="0.1.0",
+            version=self.get_version(),
             developers=["Andrey Maksimov"],
             copyright="© 2025 Andrey Maksimov",
         )
