@@ -25,7 +25,7 @@
 from gettext import gettext as _
 
 import humanize
-from gi.repository import Gio, GLib, GObject, Gtk
+from gi.repository import Gio, GObject, Gtk
 
 from norka.models.workspace import Workspace
 
@@ -64,8 +64,7 @@ class WorkspaceCard(Gtk.Box):
             self._bind_workspace(workspace)
 
     def build_menu(self):
-        """
-        """
+        """ """
         self._edit_menu = Gio.Menu.new()
 
         self.favorite_item = Gio.MenuItem.new(
@@ -114,10 +113,3 @@ class WorkspaceCard(Gtk.Box):
     @Gtk.Template.Callback()
     def _on_context_menu(self, controller, button, x, y):
         self.popover.popup()
-
-    def _on_edit_workspace(self, sender, action: str, args=None):
-        print(f"{action}: {self._workspace}")
-        if self._workspace:
-            self.activate_action(
-                "app.edit-workspace", GLib.Variant.new_string(self._workspace.id)
-            )
