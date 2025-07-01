@@ -23,7 +23,7 @@
 # SPDX-License-Identifier: MIT
 from typing import Optional, Self
 
-from gi.repository import GObject, Gom
+from gi.repository import GLib, GObject, Gom
 
 from norka.models import DatabaseManager, Workspace, get_database_manager
 
@@ -148,12 +148,23 @@ class WorkspaceService(GObject.Object):
         Delete a workspace.
 
         Args:
-            workspace: Workspace to delete
+            workspace_id: Workspace to delete
         """
-        workspace = self.get_workspace(workspace_id)
-        result = workspace.delete_sync()
-        self.emit("workspace-deleted", workspace, result)
-        return result
+        print(f"delete_workspace({workspace_id})")
+        try:
+            workspace = self.get_workspace(workspace_id)
+        except GLib.Error as e:
+            print('Error: ', e.domain)
+            print(e)
+            return False
+
+        if workspace:
+            print('Found workspace to delete: ', workspace)
+            result = workspace.delete_sync()
+            self.emit("workspace-deleted", workspace, result)
+            return result
+
+        return False
 
     def activate_workspace(self, workspace: Workspace):
         """

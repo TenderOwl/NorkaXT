@@ -49,13 +49,3 @@ template $WorkspaceCard : Box {
     pressed => $_on_context_menu();
   }
 }
-
-menu edit_menu {
-  section {
-    item (_("Favorite"), "action-name", "non-starred-symbolic")
-    item (_("Edit"), "action-name", "icon-name")
-  }
-  section {
-    item (_("Delete"), "delete-workspace", "icon-name")
-  }
-}

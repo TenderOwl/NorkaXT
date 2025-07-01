@@ -22,6 +22,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+from gettext import gettext as _
+
 import humanize
 from gi.repository import Gio, GLib, GObject, Gtk
 
@@ -39,27 +41,50 @@ class WorkspaceCard(Gtk.Box):
     }
 
     _workspace: Workspace | None = None
+    _edit_menu: Gio.Menu | None
+    favorite_item: Gio.MenuItem
+    edit_item: Gio.MenuItem
+    delete_item: Gio.MenuItem
+    workspace_id: str | None = GObject.Property(type=str)
 
     cover: Gtk.Picture = Gtk.Template.Child()
     icon: Gtk.Label = Gtk.Template.Child()
     title: Gtk.Label = Gtk.Template.Child()
     updated_at: Gtk.Label = Gtk.Template.Child()
-    edit_menu: Gio.MenuModel = Gtk.Template.Child()
 
     def __init__(self, workspace: Workspace = None):
         super().__init__()
         self._workspace = workspace
 
-        self.popover = Gtk.PopoverMenu(
-            position=Gtk.PositionType.RIGHT,
-            menu_model=self.edit_menu,
-        )
+        self.popover = Gtk.PopoverMenu(position=Gtk.PositionType.RIGHT)
         self.popover.set_parent(self)
+        self.popover.add_child(Gtk.Label(label="Edit Workspace"), "edit-workspace")
 
         if workspace:
             self._bind_workspace(workspace)
 
-        self.install_action("delete-workspace", None, self._on_delete_workspace)
+    def build_menu(self):
+        """
+        """
+        self._edit_menu = Gio.Menu.new()
+
+        self.favorite_item = Gio.MenuItem.new(
+            _("Favorite"), detailed_action=f"favorite-workspace('{self._workspace.id}')"
+        )
+        self._edit_menu.append_item(self.favorite_item)
+
+        self.edit_item = Gio.MenuItem.new(
+            _("Edit"), detailed_action=f"edit-workspace('{self._workspace.id}')"
+        )
+        self._edit_menu.append_item(self.edit_item)
+
+        self.delete_item = Gio.MenuItem.new(
+            _("Delete"), detailed_action=f"delete-workspace('{self._workspace.id}')"
+        )
+
+        delete_section = Gio.Menu()
+        delete_section.append_item(self.delete_item)
+        self._edit_menu.append_section(None, delete_section)
 
     @GObject.Property
     def workspace(self) -> Workspace | None:
@@ -72,6 +97,10 @@ class WorkspaceCard(Gtk.Box):
 
     def _bind_workspace(self, workspace: Workspace):
         print("bind workspace:", workspace)
+
+        self.build_menu()
+        self.popover.set_menu_model(self._edit_menu)
+
         workspace.cover = workspace.cover or "cover-1"
         self.cover.set_resource(f"/com/tenderowl/norka/covers/{workspace.cover}")
 
@@ -91,11 +120,4 @@ class WorkspaceCard(Gtk.Box):
         if self._workspace:
             self.activate_action(
                 "app.edit-workspace", GLib.Variant.new_string(self._workspace.id)
-            )
-
-    def _on_delete_workspace(self, sender, action: str, args=None):
-        print(f"{action}: {self._workspace}")
-        if self._workspace:
-            self.activate_action(
-                "app.delete-workspace", GLib.Variant.new_string(self._workspace.id)
             )

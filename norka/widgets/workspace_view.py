@@ -49,6 +49,10 @@ class WorkspaceView(Gtk.Box):
 
         self.grid_view.remove_css_class("view")
 
+        self.install_action("favorite-workspace", "s", self._on_delete_workspace)
+        self.install_action("edit-workspace", "s", self._on_delete_workspace)
+        self.install_action("delete-workspace", "s", self._on_delete_workspace)
+
     @GObject.Property
     def workspaces(self) -> List[Workspace]:
         return self._workspaces
@@ -75,3 +79,10 @@ class WorkspaceView(Gtk.Box):
         item = list_item.get_item()
         workspace_card = list_item.get_child()
         workspace_card.workspace = item
+
+    def _on_delete_workspace(self, sender, action: str, workspace_id=None):
+        print(f"{action}: {workspace_id.get_string()}")
+        if not workspace_id:
+            return
+
+        self.activate_action("app.delete-workspace", workspace_id)

@@ -21,10 +21,11 @@
 # SOFTWARE.
 #
 # SPDX-License-Identifier: MIT
-
+import asyncio
 import sys
 from gettext import gettext as _
 
+from gi.events import GLibEventLoopPolicy
 from gi.repository import Adw, Gio, GLib
 
 from norka.models.workspace_service import WorkspaceService
@@ -109,5 +110,6 @@ class NorkaApplication(Adw.Application):
 
 def main(version: str, profile: str):
     """The application's entry point."""
+    asyncio.set_event_loop_policy(GLibEventLoopPolicy())
     app = NorkaApplication(version, profile)
     return app.run(sys.argv)
