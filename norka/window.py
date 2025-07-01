@@ -22,7 +22,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from gi.repository import Adw, GLib, Gtk
+from gi.repository import Adw, GLib, Gtk, Gio
 from loguru import logger
 
 from norka.models.workspace_service import WorkspaceService
@@ -47,6 +47,20 @@ class NorkaWindow(Adw.ApplicationWindow):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        application: Gio.Application = kwargs.get("application")
+        assert application
+
+        self.settings = Gio.Settings(schema_id=application.get_application_id())
+        self.settings.bind(
+            "window-width", self, "default-width", Gio.SettingsBindFlags.DEFAULT
+        )
+        self.settings.bind(
+            "window-height", self, "default-height", Gio.SettingsBindFlags.DEFAULT
+        )
+        self.settings.bind(
+            "window-maximized", self, "maximized", Gio.SettingsBindFlags.DEFAULT
+        )
 
         self.workspace_service = WorkspaceService.get_default()
         self.workspace_service.connect(
