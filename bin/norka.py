@@ -32,11 +32,7 @@ import sys
 
 import gi
 
-VERSION = "@VERSION@"
-pkgdatadir = "@pkgdatadir@"
-localedir = "@localedir@"
-PROFILE = "@PROFILE@"
-APP_ID = "@APP_ID@"
+from constants import *
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
@@ -58,3 +54,4 @@ if __name__ == "__main__":
     from norka import main
 
     sys.exit(main.main(VERSION, PROFILE))
+

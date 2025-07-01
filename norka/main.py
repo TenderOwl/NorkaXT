@@ -37,6 +37,7 @@ class NorkaApplication(Adw.Application):
     """The main application singleton class."""
 
     _workspace_service: WorkspaceService | None = None
+    _profile: str = ''
 
     def __init__(self, version: str, profile: str):
         super().__init__(
@@ -44,6 +45,10 @@ class NorkaApplication(Adw.Application):
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
             resource_base_path="/com/tenderowl/norka",
         )
+
+        self._profile = profile
+
+        logger.debug("Started with profile: {}", profile)
 
         self.create_action("quit", lambda *_: self.quit(), ["<primary>q"])
         self.create_action("about", self.on_about_action)
@@ -63,6 +68,8 @@ class NorkaApplication(Adw.Application):
         win: NorkaWindow | None = self.props.active_window
         if not win:
             win = NorkaWindow(application=self)
+            if self._profile == "Devel":
+                win.add_css_class("devel")
         win.present()
 
     def do_startup(self):

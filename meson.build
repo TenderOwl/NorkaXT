@@ -36,6 +36,7 @@ else
   profile = ''
   version_suffix = ''
 endif
+app_version = meson.project_version()
 
 subdir('bin')
 subdir('data')

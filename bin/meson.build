@@ -9,8 +9,17 @@ conf.set('APP_ID', app_id)
 conf.set('PROFILE', profile)
 
 configure_file(
-  input: 'norkaxt.py',
-  output: 'norkaxt',
+  input: 'constants.in',
+  output: 'constants.py',
+  configuration: conf,
+  install: true,
+  install_dir: get_option('bindir'),
+  install_mode: 'r-xr-xr-x'
+)
+
+configure_file(
+  input: 'norka.py',
+  output: 'norka',
   configuration: conf,
   install: true,
   install_dir: get_option('bindir'),
