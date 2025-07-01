@@ -23,6 +23,7 @@
 # SPDX-License-Identifier: MIT
 
 from gi.repository import Adw, GLib, Gtk
+from loguru import logger
 
 from norka.models.workspace_service import WorkspaceService
 from norka.widgets.add_workspace_dialog import AddWorkspaceDialog
@@ -48,9 +49,18 @@ class NorkaWindow(Adw.ApplicationWindow):
         super().__init__(**kwargs)
 
         self.workspace_service = WorkspaceService.get_default()
-        self.workspace_service.connect("workspace-created", lambda _, workspace: GLib.idle_add(self._get_workspaces))
-        self.workspace_service.connect("workspace-updated", lambda _, workspace: GLib.idle_add(self._get_workspaces))
-        self.workspace_service.connect("workspace-deleted", lambda _, workspace, deleted: GLib.idle_add(self._get_workspaces))
+        self.workspace_service.connect(
+            "workspace-created",
+            lambda _, workspace: GLib.idle_add(self._get_workspaces),
+        )
+        self.workspace_service.connect(
+            "workspace-updated",
+            lambda _, workspace: GLib.idle_add(self._get_workspaces),
+        )
+        self.workspace_service.connect(
+            "workspace-deleted",
+            lambda _, workspace, deleted: GLib.idle_add(self._get_workspaces),
+        )
 
         GLib.idle_add(self._get_workspaces)
 
@@ -68,5 +78,5 @@ class NorkaWindow(Adw.ApplicationWindow):
         dialog.present(self)
 
     def _on_workspace_created(self, sender, workspace_name, emoji, cover):
-        print(workspace_name, emoji)
-        self.workspace_service.create_workspace(workspace_name,icon=emoji, cover=cover)
+        logger.debug("Workspace created: {} {}", emoji, workspace_name)
+        self.workspace_service.create_workspace(workspace_name, icon=emoji, cover=cover)

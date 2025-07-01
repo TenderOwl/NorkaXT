@@ -24,6 +24,7 @@
 
 from gettext import gettext as _
 
+from loguru import logger
 import humanize
 from gi.repository import Gio, GObject, Gtk
 
@@ -95,7 +96,7 @@ class WorkspaceCard(Gtk.Box):
         self._bind_workspace(workspace)
 
     def _bind_workspace(self, workspace: Workspace):
-        print("bind workspace:", workspace)
+        logger.debug("Bind workspace: {}", workspace)
 
         self.build_menu()
         self.popover.set_menu_model(self._edit_menu)

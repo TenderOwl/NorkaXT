@@ -24,6 +24,7 @@
 from typing import Optional, Self
 
 from gi.repository import GLib, GObject, Gom
+from loguru import logger
 
 from norka.models import DatabaseManager, Workspace, get_database_manager
 
@@ -45,7 +46,7 @@ class WorkspaceService(GObject.Object):
     def __init__(self, database: DatabaseManager, **kwargs):
         super().__init__(**kwargs)
         self._database = database
-        print("WorkspaceService initialized with database", database.database_path)
+        logger.debug("WorkspaceService initialized with database at {}", database.database_path)
 
     @classmethod
     def get_default(cls) -> Self:
@@ -150,16 +151,16 @@ class WorkspaceService(GObject.Object):
         Args:
             workspace_id: Workspace to delete
         """
-        print(f"delete_workspace({workspace_id})")
+        logger.debug("delete_workspace({})", workspace_id)
         try:
             workspace = self.get_workspace(workspace_id)
         except GLib.Error as e:
-            print('Error: ', e.domain)
-            print(e)
+            logger.error('Error: ', e.domain)
+            logger.error(e)
             return False
 
         if workspace:
-            print('Found workspace to delete: ', workspace)
+            logger.debug('Found workspace to delete: {}', workspace)
             result = workspace.delete_sync()
             self.emit("workspace-deleted", workspace, result)
             return result

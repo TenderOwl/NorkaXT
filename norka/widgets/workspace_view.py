@@ -24,6 +24,7 @@
 from typing import List
 
 from gi.repository import Gio, GLib, GObject, Gtk
+from loguru import logger
 
 from norka.models.workspace import Workspace
 from norka.widgets.workspace_card import WorkspaceCard
@@ -50,7 +51,7 @@ class WorkspaceView(Gtk.Box):
         self.grid_view.remove_css_class("view")
 
         self.install_action("favorite-workspace", "s", self._on_favorite_workspace)
-        self.install_action("edit-workspace", "s", self._on_edit_workspace      )
+        self.install_action("edit-workspace", "s", self._on_edit_workspace)
         self.install_action("delete-workspace", "s", self._on_delete_workspace)
 
     @GObject.Property
@@ -81,21 +82,21 @@ class WorkspaceView(Gtk.Box):
         workspace_card.workspace = item
 
     def _on_delete_workspace(self, sender, action: str, workspace_id: GLib.Variant):
-        print(f"{action}: {workspace_id.get_string()}")
+        logger.debug("{}: {}", action, workspace_id.get_string())
         if not workspace_id:
             return
 
         self.activate_action("app.delete-workspace", workspace_id)
 
     def _on_edit_workspace(self, sender, action: str, workspace_id: GLib.Variant):
-        print(f"{action}: {workspace_id.get_string()}")
+        logger.debug("{}: {}", action, workspace_id.get_string())
         if not workspace_id:
             return
 
         self.activate_action("app.edit-workspace", workspace_id)
 
     def _on_favorite_workspace(self, sender, action: str, workspace_id: GLib.Variant):
-        print(f"{action}: {workspace_id.get_string()}")
+        logger.debug("{}: {}", action, workspace_id.get_string())
         if not workspace_id:
             return
 

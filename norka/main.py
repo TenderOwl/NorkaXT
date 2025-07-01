@@ -27,6 +27,7 @@ from gettext import gettext as _
 
 from gi.events import GLibEventLoopPolicy
 from gi.repository import Adw, Gio, GLib
+from loguru import logger
 
 from norka.models.workspace_service import WorkspaceService
 from norka.window import NorkaWindow
@@ -84,11 +85,11 @@ class NorkaApplication(Adw.Application):
 
     def on_preferences_action(self, widget, _):
         """Callback for the app.preferences action."""
-        print("app.preferences action activated")
+        logger.debug("app.preferences action activated")
 
     def on_delete_workspace_action(self, action, param: GLib.Variant):
         workspace_id = param.get_string()
-        print(f"delete workspace {workspace_id}")
+        logger.debug("delete workspace {}", workspace_id)
         GLib.idle_add(self._workspace_service.delete_workspace, workspace_id)
 
     def create_action(self, name, callback, shortcuts=None, parameter_type=None):
