@@ -27,7 +27,6 @@ from pathlib import Path
 from typing import List, Optional
 
 import nanoid
-from gi.module import repository
 from gi.repository import GObject, Gom
 from gi.types import GObjectMeta
 
@@ -124,7 +123,7 @@ class Workspace(Gom.Resource, metaclass=WorkspaceResourceMeta):
         cls,
         name: str,
         description: str = None,
-        path: str = None,
+        cover: str = None,
         icon: str = None,
         repository=None,
     ) -> "Workspace":
@@ -141,7 +140,13 @@ class Workspace(Gom.Resource, metaclass=WorkspaceResourceMeta):
         Returns:
             New Workspace instance
         """
-        workspace = cls(name=name, description=description, path=path, icon=icon, repository=repository)
+        workspace = cls(
+            name=name,
+            description=description,
+            cover=cover,
+            icon=icon,
+            repository=repository,
+        )
         workspace.created_at = int(datetime.now().timestamp())
         workspace.updated_at = workspace.created_at
         return workspace
