@@ -22,10 +22,13 @@
 #
 # SPDX-License-Identifier: MIT
 
-from gi.repository import Adw, GObject, Gtk
+from gettext import gettext as _
+
+from gi.repository import Adw, GLib, GObject, Gtk
+from loguru import logger
 
 from norka.models import Workspace
-from norka.services import WorkspaceService
+from norka.services import PageService, WorkspaceService
 from norka.widgets.content_view import ContentView
 from norka.widgets.sidebar import Sidebar
 
@@ -44,6 +47,9 @@ class ContentPage(Adw.BreakpointBin):
         super().__init__(**kwargs)
 
         self._workspace_service = WorkspaceService.get_default()
+        self._page_service = PageService.get_default()
+
+        self.install_action("win.create-page", None, self._on_create_page_action)
 
     @GObject.Property
     def workspace(self) -> Workspace | None:
@@ -52,5 +58,18 @@ class ContentPage(Adw.BreakpointBin):
     @workspace.setter
     def workspace(self, workspace: Workspace):
         self._workspace = workspace
-        if workspace:
-            self.sidebar_container.set_title(self._workspace.name_with_icon)
+        if not workspace:
+            return
+
+        self.sidebar_container.set_title(self._workspace.name_with_icon)
+        self.sidebar.workspace = workspace
+
+    def _on_create_page_action(self, sender: Gtk.Widget, action: str, args=None):
+        logger.debug("New page action activated")
+
+        if self._workspace and self._page_service:
+            GLib.idle_add(self._create_page)
+
+    def _create_page(self):
+        self._page_service.create_page(self._workspace.id, _("Untitled"), "")
+        return False

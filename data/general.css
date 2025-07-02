@@ -2,3 +2,9 @@
 .workspace-card modelbutton:last-child {
   color: var(--error-color);
 }
+
+.divider {
+  margin-left: 12px;
+  margin-right: 12px;
+  background-color: var(--border-color);
+}

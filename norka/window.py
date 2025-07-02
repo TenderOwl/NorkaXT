@@ -106,7 +106,7 @@ class NorkaWindow(Adw.ApplicationWindow):
         self.workspace_service.create_workspace(workspace_name, icon=emoji, cover=cover)
 
     def _on_workspace_activated(self, _service: WorkspaceService, workspace: Workspace):
-        logger.debug("Workspace: ", workspace)
+        logger.debug("Workspace: {}", workspace)
         self.content_page.workspace = workspace
         self.screens.set_visible_child_name(CONTENT_STACK_PAGE)
 

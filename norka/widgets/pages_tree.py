@@ -5,7 +5,7 @@
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
-# to use, copy, modify, pagesmerge, publish, distribute, sublicense, and/or sell
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 #
@@ -22,45 +22,31 @@
 #
 # SPDX-License-Identifier: MIT
 
-from gi.repository import Adw, GLib, GObject, Gtk
+from gi.repository import Gio, GObject, Gtk
 from loguru import logger
 
-from norka.models import Page, Workspace
-from norka.services import PageService
-from norka.widgets.pages_tree import PagesTree
+from norka.models import Page
 
 
-@Gtk.Template(resource_path="/com/tenderowl/norka/ui/sidebar.ui")
-class Sidebar(Adw.Bin):
-    __gtype_name__ = "Sidebar"
+class TreeNode(GObject.Object):
+    def __init__(self, item: Page, depth=0):
+        super().__init__()
+        self.item = item
+        self.depth = depth
+        self.is_folder = isinstance(item, Page)
 
-    pages_tree: PagesTree = Gtk.Template.Child()
 
-    _workspace: Workspace | None
+@Gtk.Template(resource_path="/com/tenderowl/norka/ui/pages_tree.ui")
+class PagesTree(Gtk.Box):
+    __gtype_name__ = "PagesTree"
+
+    selection: Gtk.SingleSelection = Gtk.Template.Child()
+    list_view: Gtk.ListView = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self._page_service = PageService.get_default()
-        self._page_service.connect("page-created", self._on_page_created)
 
-    @GObject.Property
-    def workspace(self):
-        return self._workspace
-
-    @workspace.setter
-    def workspace(self, workspace: Workspace):
-        self._workspace = workspace
-
-        if not workspace:
-            return
-
-        GLib.idle_add(self._get_page_tree)
-
-    def _get_page_tree(self):
-        pages_tree = self._page_service.get_page_tree(self._workspace.id)
-
-        logger.debug("Pages Tree: {}", pages_tree)
-
-    def _on_page_created(self, sender, page: Page):
-        logger.debug("Page created: {}", page)
+    @Gtk.Template.Callback
+    def _on_selection_changed(self, selectin: Gtk.SingleSelection, position: int, n_items: int):
+        logger.debug("Selected position: {}", position)

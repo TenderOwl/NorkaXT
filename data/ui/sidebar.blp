@@ -6,6 +6,13 @@ template $Sidebar : Adw.Bin {
   Adw.ToolbarView {
     [top]
     Adw.HeaderBar {
+      [start]
+      Button {
+        icon-name: "list-add-symbolic";
+        tooltip-text: _("Create New Page");
+        action-name: "win.create-page";
+      }
+
       [end]
       MenuButton {
         primary: true;
@@ -15,12 +22,49 @@ template $Sidebar : Adw.Bin {
       }
     }
 
-    content:  Label {
-      label: _("Sidebar");
+    content: Box {
+      orientation: vertical;
 
-      styles [
-        "title-1",
-      ]
+      ListBox {
+        styles ["navigation-sidebar"]
+
+        ListBoxRow {
+          Box {
+            spacing: 6;
+
+            Image {
+              icon-name: "starred-symbolic";
+            }
+
+            Label {
+              label: _("Starred");
+              xalign: 0;
+            }
+          }
+        }
+
+        ListBoxRow {
+          Box {
+            spacing: 6;
+
+            Image {
+              icon-name: "system-file-manager-symbolic";
+            }
+
+            Label {
+              label: _("Archive");
+              xalign: 0;
+            }
+          }
+        }
+      }
+
+      Box {
+        height-request: 1;
+        styles ["divider"]
+      }
+
+      $PagesTree pages_tree {}
     };
   }
 }

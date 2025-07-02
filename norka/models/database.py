@@ -69,7 +69,7 @@ class DatabaseManager:
 
         # Create the table
         self._repository = Gom.Repository(adapter=self._adapter)
-        self._repository.automatic_migrate_sync(1, [Workspace, Page])
+        self._repository.automatic_migrate_sync(2, [Workspace, Page])
 
     @property
     def database_path(self):
