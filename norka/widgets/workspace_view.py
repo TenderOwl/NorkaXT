@@ -28,6 +28,7 @@ from loguru import logger
 
 from norka.models.workspace import Workspace
 from norka.services import WorkspaceService
+from norka.widgets.edit_workspace_dialog import EditWorkspaceDialog
 from norka.widgets.workspace_card import WorkspaceCard
 
 EMPTY_STACK_PAGE = "empty-view"
@@ -100,11 +101,18 @@ class WorkspaceView(Gtk.Box):
         self.activate_action("app.delete-workspace", workspace_id)
 
     def _on_edit_workspace(self, sender, action: str, workspace_id: GLib.Variant):
-        logger.debug("{}: {}", action, workspace_id.get_string())
+        _workspace_id = workspace_id.get_string()
+        logger.debug("{}: {}", action, _workspace_id)
         if not workspace_id:
-            return
+            return None
 
-        self.activate_action("app.edit-workspace", workspace_id)
+        workspace = WorkspaceService.get_default().get_workspace(_workspace_id)
+        if not workspace:
+            return None
+
+        dialog = EditWorkspaceDialog(workspace=workspace)
+        dialog.connect("workspace-updated", self._on_workspace_updated)
+        return dialog.present(self)
 
     def _on_favorite_workspace(self, sender, action: str, workspace_id: GLib.Variant):
         logger.debug("{}: {}", action, workspace_id.get_string())
@@ -112,3 +120,8 @@ class WorkspaceView(Gtk.Box):
             return
 
         self.activate_action("app.favorite-workspace", workspace_id)
+
+    def _on_workspace_updated(self, sender, workspace: Workspace):
+        logger.debug("Workspace: {}", workspace)
+        GLib.idle_add(WorkspaceService.get_default().update_workspace, workspace)
+

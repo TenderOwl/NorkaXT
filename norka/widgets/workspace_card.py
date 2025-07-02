@@ -74,7 +74,7 @@ class WorkspaceCard(Gtk.Box):
         self._edit_menu.append_item(self.favorite_item)
 
         self.edit_item = Gio.MenuItem.new(
-            _("Edit"), detailed_action=f"edit-workspace('{self._workspace.id}')"
+            _("Rename and Style"), detailed_action=f"edit-workspace('{self._workspace.id}')"
         )
         self._edit_menu.append_item(self.edit_item)
 

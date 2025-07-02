@@ -21,6 +21,7 @@
 # SOFTWARE.
 #
 # SPDX-License-Identifier: MIT
+import datetime
 from typing import Optional, Self
 
 from gi.repository import GLib, GObject, Gom
@@ -146,6 +147,25 @@ class WorkspaceService(GObject.Object):
         count = len(group)
         group.fetch_sync(0, count)
         return list(group)
+
+    def update_workspace(self, workspace: Workspace) -> bool:
+        """
+        Update a workspace.
+
+        Args:
+            workspace: Workspace to update
+        """
+        try:
+            workspace.updated_at = int(datetime.datetime.now().timestamp())
+            workspace.update_access_time()
+            workspace.save_sync()
+            self.emit("workspace-updated", workspace)
+
+        except GLib.Error as e:
+            logger.error("Error: ", e.domain)
+            logger.error(e)
+
+        return False
 
     def delete_workspace(self, workspace_id: str) -> bool:
         """

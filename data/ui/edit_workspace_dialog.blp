@@ -1,0 +1,88 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $EditWorkspaceDialog: Adw.Dialog {
+  content-width: 480;
+  content-height: 360;
+  focus-widget: name;
+
+  title: _("Rename and Style");
+
+  Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {
+      show-end-title-buttons: false;
+
+      [start]
+      Button {
+        label: _("Cancel");
+        clicked => $_on_cancel_clicked();
+      }
+
+      [end]
+      Button {
+        label: _("Update");
+        clicked => $_on_ok_clicked();
+
+        styles [
+          "suggested-action",
+        ]
+      }
+    }
+
+    Box {
+      orientation: vertical;
+      spacing: 12;
+      margin-end: 12;
+      margin-top: 12;
+      margin-start: 12;
+      margin-bottom: 12;
+
+
+      Box {
+        styles ["card"]
+
+        Overlay overlay {
+          hexpand: true;
+
+          [overlay]
+          Button change_cover_btn {
+            icon-name: 'view-refresh-symbolic';
+            halign: end;
+            valign: end;
+            margin-top: 6;
+            margin-end: 6;
+            margin-start: 6;
+            margin-bottom: 6;
+            clicked => $_on_change_cover_clicked();
+            styles ["osd"]
+          }
+
+          child: Picture cover {
+            height-request: 120;
+            alternative-text: _("Choose a cover image");
+            content-fit: cover;
+            halign: center;
+            valign: center;
+            styles ["card"]
+          };
+        }
+      }
+
+      Box {
+        spacing: 12;
+
+        Button emoji_btn {
+          label: _("🚀");
+          clicked => $_on_choose_emoji_clicked();
+        }
+
+        Entry name {
+          hexpand: true;
+          placeholder-text: _("Type a name");
+          activate => $_on_entry_activate();
+        }
+      }
+    }
+  }
+}
