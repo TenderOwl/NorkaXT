@@ -47,10 +47,15 @@ template $AddWorkspaceDialog: Adw.Dialog {
 
           [overlay]
           Button {
-            icon-name: 'view-more-horizontal-symbolic';
-            halign: center;
-            valign: center;
+            icon-name: 'view-refresh-symbolic';
+            halign: end;
+            valign: end;
+            margin-top: 6;
+            margin-end: 6;
+            margin-start: 6;
+            margin-bottom: 6;
             clicked => $_on_change_cover_clicked();
+            styles ["osd"]
           }
 
           child: Picture cover {

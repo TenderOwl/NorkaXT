@@ -31,6 +31,15 @@ template $NorkaWindow: Adw.ApplicationWindow {
               icon-name: "list-add-symbolic";
               clicked => $_on_add_workspace_clicked();
             }
+
+
+            [end]
+            MenuButton {
+              primary: true;
+              icon-name: "open-menu-symbolic";
+              tooltip-text: _("Main Menu");
+              menu-model: primary_menu;
+            }
            }
 
            $WorkspaceView workspace_view {}
@@ -58,6 +67,25 @@ template $NorkaWindow: Adw.ApplicationWindow {
           }
         };
       }
+    }
+  }
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: _("_Preferences");
+      action: "app.preferences";
+    }
+
+    item {
+      label: _("_Keyboard Shortcuts");
+      action: "win.show-help-overlay";
+    }
+
+    item {
+      label: _("_About NorkaXT");
+      action: "app.about";
     }
   }
 }

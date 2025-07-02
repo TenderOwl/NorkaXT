@@ -79,12 +79,12 @@ class NorkaApplication(Adw.Application):
     def on_about_action(self, *args):
         """Callback for the app.about action."""
         about = Adw.AboutDialog(
-            application_name="norka",
+            application_name="Norka",
             application_icon="com.tenderowl.norka",
-            developer_name="Andrey Maksimov",
+            developer_name="Tender Owl",
             version=self.get_version(),
             developers=["Andrey Maksimov"],
-            copyright="© 2025 Andrey Maksimov",
+            copyright="© 2025 Tender Owl",
         )
         # Translators: Replace "translator-credits" with your name/username, and optionally an email or URL.
         about.set_translator_credits(_("translator-credits"))
