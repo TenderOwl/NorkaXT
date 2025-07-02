@@ -27,6 +27,7 @@ from gi.repository import Gio, GLib, GObject, Gtk
 from loguru import logger
 
 from norka.models.workspace import Workspace
+from norka.models.workspace_service import WorkspaceService
 from norka.widgets.workspace_card import WorkspaceCard
 
 EMPTY_STACK_PAGE = "empty-view"
@@ -80,6 +81,16 @@ class WorkspaceView(Gtk.Box):
         item = list_item.get_item()
         workspace_card = list_item.get_child()
         workspace_card.workspace = item
+
+    @Gtk.Template.Callback()
+    def _on_item_activate(self, _sender: Gtk.GridView, position: int):
+        logger.debug("Position: {}", position)
+        workspace: Workspace = self.workspaces_store.get_item(position)
+        if not workspace:
+            return
+        logger.debug("Workspace: {}", workspace)
+
+        GLib.idle_add(WorkspaceService.get_default().activate_workspace, workspace.id)
 
     def _on_delete_workspace(self, sender, action: str, workspace_id: GLib.Variant):
         logger.debug("{}: {}", action, workspace_id.get_string())

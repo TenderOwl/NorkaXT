@@ -28,9 +28,9 @@ from gi.repository import Adw, GObject, Gtk
 from norka.models import Workspace
 
 
-@Gtk.Template(resource_path="/com/tenderowl/norka/ui/main_view.ui")
-class MainView(Adw.Bin):
-    __gtype_name__ = "MainView"
+@Gtk.Template(resource_path="/com/tenderowl/norka/ui/content_view.ui")
+class ContentView(Adw.Bin):
+    __gtype_name__ = "ContentView"
 
     _workspaces: List[Workspace] = []
 

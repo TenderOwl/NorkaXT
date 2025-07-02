@@ -49,7 +49,7 @@ class WorkspaceCard(Gtk.Box):
     workspace_id: str | None = GObject.Property(type=str)
 
     cover: Gtk.Picture = Gtk.Template.Child()
-    icon: Gtk.Label = Gtk.Template.Child()
+    # icon: Gtk.Label = Gtk.Template.Child()
     title: Gtk.Label = Gtk.Template.Child()
     updated_at: Gtk.Label = Gtk.Template.Child()
 
@@ -104,11 +104,11 @@ class WorkspaceCard(Gtk.Box):
         workspace.cover = workspace.cover or "cover-1"
         self.cover.set_resource(f"/com/tenderowl/norka/covers/{workspace.cover}")
 
-        if workspace.icon:
-            self.icon.set_label(workspace.icon)
-        else:
-            self.icon.set_visible(False)
-        self.title.set_label(workspace.name)
+        # if workspace.icon:
+        #     self.icon.set_label(workspace.icon)
+        # else:
+        #     self.icon.set_visible(False)
+        self.title.set_label(workspace.name_with_icon)
         self.updated_at.set_label(humanize.naturaldate(workspace.last_accessed_dt))
 
     @Gtk.Template.Callback()

@@ -41,12 +41,15 @@ class WorkspaceService(GObject.Object):
         "workspace-created": (GObject.SIGNAL_RUN_FIRST, None, (Workspace,)),
         "workspace-updated": (GObject.SIGNAL_RUN_FIRST, None, (Workspace,)),
         "workspace-deleted": (GObject.SIGNAL_RUN_FIRST, None, (Workspace, bool)),
+        "workspace-activated": (GObject.SIGNAL_RUN_FIRST, None, (Workspace,)),
     }
 
     def __init__(self, database: DatabaseManager, **kwargs):
         super().__init__(**kwargs)
         self._database = database
-        logger.debug("WorkspaceService initialized with database at {}", database.database_path)
+        logger.debug(
+            "WorkspaceService initialized with database at {}", database.database_path
+        )
 
     @classmethod
     def get_default(cls) -> Self:
@@ -86,8 +89,8 @@ class WorkspaceService(GObject.Object):
         Returns:
             Workspace or None if not found
         """
-        filter = Gom.Filter.new_eq(Workspace, "id", workspace_id)
-        return self._database.repository.find_one_sync(Workspace, filter)
+        _filter = Gom.Filter.new_eq(Workspace, "id", workspace_id)
+        return self._database.repository.find_one_sync(Workspace, _filter)
 
     def get_workspace_by_name(self, name: str) -> Optional[Workspace]:
         """
@@ -149,29 +152,40 @@ class WorkspaceService(GObject.Object):
         Delete a workspace.
 
         Args:
-            workspace_id: Workspace to delete
+            workspace_id: Workspace ID to delete
         """
         logger.debug("delete_workspace({})", workspace_id)
         try:
             workspace = self.get_workspace(workspace_id)
         except GLib.Error as e:
-            logger.error('Error: ', e.domain)
+            logger.error("Error: ", e.domain)
             logger.error(e)
             return False
 
         if workspace:
-            logger.debug('Found workspace to delete: {}', workspace)
+            logger.debug("Found workspace to delete: {}", workspace)
             result = workspace.delete_sync()
             self.emit("workspace-deleted", workspace, result)
             return result
 
         return False
 
-    def activate_workspace(self, workspace: Workspace):
+    def activate_workspace(self, workspace_id: str):
         """
         Activate a workspace.
 
         Args:
-            workspace: Workspace to activate
+            workspace_id: Workspace ID to activate
         """
-        workspace.activate(self._session)
+        try:
+            workspace = self.get_workspace(workspace_id)
+        except GLib.Error as e:
+            logger.error("Error: ", e.domain)
+            logger.error(e)
+            return False
+
+        workspace.update_access_time()
+        workspace.save_sync()
+        self.emit("workspace-activated", workspace)
+
+        return None

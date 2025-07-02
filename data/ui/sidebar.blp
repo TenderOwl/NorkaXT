@@ -29,6 +29,13 @@ template $Sidebar : Adw.Bin {
 menu primary_menu {
   section {
     item {
+      label: _("Close Workspace");
+      action: "win.workspace-deactivate";
+    }
+  }
+
+  section {
+    item {
       label: _("_Preferences");
       action: "app.preferences";
     }

@@ -22,13 +22,13 @@
 #
 # SPDX-License-Identifier: MIT
 
-from gi.repository import Adw, GLib, Gtk, Gio
+from gi.repository import Adw, Gio, GLib, Gtk
 from loguru import logger
 
+from norka.models import Workspace
 from norka.models.workspace_service import WorkspaceService
 from norka.widgets.add_workspace_dialog import AddWorkspaceDialog
-from norka.widgets.main_view import MainView
-from norka.widgets.sidebar import Sidebar
+from norka.widgets.content_page import ContentPage
 from norka.widgets.workspace_view import WorkspaceView
 
 WORKSPACES_STACK_PAGE = "workspaces-view"
@@ -42,14 +42,15 @@ class NorkaWindow(Adw.ApplicationWindow):
     toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
     screens: Gtk.Stack = Gtk.Template.Child()
     workspace_view: WorkspaceView = Gtk.Template.Child()
-    sidebar: Sidebar = Gtk.Template.Child()
-    main_view: MainView = Gtk.Template.Child()
+    content_page: ContentPage = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
         application: Gio.Application = kwargs.get("application")
         assert application
+
+        self._install_actions()
 
         self.settings = Gio.Settings(schema_id=application.get_application_id())
         self.settings.bind(
@@ -62,6 +63,7 @@ class NorkaWindow(Adw.ApplicationWindow):
             "window-maximized", self, "maximized", Gio.SettingsBindFlags.DEFAULT
         )
 
+        # Connect signals
         self.workspace_service = WorkspaceService.get_default()
         self.workspace_service.connect(
             "workspace-created",
@@ -76,7 +78,15 @@ class NorkaWindow(Adw.ApplicationWindow):
             lambda _, workspace, deleted: GLib.idle_add(self._get_workspaces),
         )
 
+        self.workspace_service.connect(
+            "workspace-activated", self._on_workspace_activated
+        )
+
         GLib.idle_add(self._get_workspaces)
+
+    def _install_actions(self):
+        self.install_action("win.workspace-deactivate", None, self._on_workspace_deactivate)
+        self.get_application().set_accels_for_action("win.workspace-deactivate", ["<ctrl>w"])
 
     def add_toast(self, toast: Adw.Toast):
         self.toast_overlay.add_toast(toast)
@@ -94,3 +104,14 @@ class NorkaWindow(Adw.ApplicationWindow):
     def _on_workspace_created(self, sender, workspace_name, emoji, cover):
         logger.debug("Workspace created: {} {}", emoji, workspace_name)
         self.workspace_service.create_workspace(workspace_name, icon=emoji, cover=cover)
+
+    def _on_workspace_activated(self, _service: WorkspaceService, workspace: Workspace):
+        logger.debug("Workspace: ", workspace)
+        self.content_page.workspace = workspace
+        self.screens.set_visible_child_name(CONTENT_STACK_PAGE)
+
+    def _on_workspace_deactivate(self, *args):
+        workspace: Workspace = self.content_page.props.workspace
+        logger.debug("Deactivating workspace: {}", workspace)
+        self.content_page.workspace = None
+        self.screens.set_visible_child_name(WORKSPACES_STACK_PAGE)

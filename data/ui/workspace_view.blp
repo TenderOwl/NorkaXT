@@ -31,6 +31,9 @@ template $WorkspaceView : Box {
           margin-top: 12;
           margin-start: 12;
           margin-bottom: 12;
+          single-click-activate: true;
+
+          activate => $_on_item_activate();
 
           model: NoSelection selection_model {
             model: Gio.ListStore workspaces_store {

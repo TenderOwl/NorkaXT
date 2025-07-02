@@ -118,6 +118,10 @@ class Workspace(Gom.Resource, metaclass=WorkspaceResourceMeta):
     def last_accessed_dt(self) -> datetime:
         return datetime.fromtimestamp(self.last_accessed)
 
+    @property
+    def name_with_icon(self):
+        return f"{self.icon if self.icon else ''} {self.name}"
+
     @classmethod
     def create(
         cls,
@@ -218,7 +222,7 @@ class Workspace(Gom.Resource, metaclass=WorkspaceResourceMeta):
 
     def update_access_time(self):
         """Update the last accessed time."""
-        self.last_accessed = datetime.now()
+        self.last_accessed = int(datetime.now().timestamp())
 
     def get_path(self) -> Optional[Path]:
         """

@@ -3,11 +3,12 @@
     <gresource prefix="/com/tenderowl/norka">
         <file preprocess="xml-stripblanks">ui/window.ui</file>
         <file preprocess="xml-stripblanks">ui/help-overlay.ui</file>
-        <file preprocess="xml-stripblanks">ui/main_view.ui</file>
         <file preprocess="xml-stripblanks">ui/sidebar.ui</file>
         <file preprocess="xml-stripblanks">ui/workspace_view.ui</file>
         <file preprocess="xml-stripblanks">ui/workspace_card.ui</file>
         <file preprocess="xml-stripblanks">ui/add_workspace_dialog.ui</file>
+        <file preprocess="xml-stripblanks">ui/content_page.ui</file>
+        <file preprocess="xml-stripblanks">ui/content_view.ui</file>
     </gresource>
     <gresource prefix="/com/tenderowl/norka/covers">
         <file alias="cover-1">covers/cover-1.jpg</file>
