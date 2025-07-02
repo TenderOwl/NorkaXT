@@ -24,27 +24,42 @@ template $WorkspaceView : Box {
       child: Adw.Clamp {
         maximum-size: 1200;
 
-        GridView grid_view {
-          max-columns: 4;
+        Adw.BreakpointBin {
+          height-request: 300;
+          width-request: 300;
 
-          margin-end: 12;
-          margin-top: 12;
-          margin-start: 12;
-          margin-bottom: 12;
-          single-click-activate: true;
+          Adw.Breakpoint {
+            condition ("max-width: 600px")
+            setters { grid_view.max-columns: 2; }
+          }
 
-          activate => $_on_item_activate();
+          Adw.Breakpoint {
+            condition ("min-width: 800px")
+            setters { grid_view.max-columns: 4; }
+          }
 
-          model: NoSelection selection_model {
-            model: Gio.ListStore workspaces_store {
-              item-type: typeof<GObject.Object>;
+          GridView grid_view {
+            max-columns: 3;
+
+            margin-end: 12;
+            margin-top: 12;
+            margin-start: 12;
+            margin-bottom: 12;
+            single-click-activate: true;
+
+            activate => $_on_item_activate();
+
+            model: NoSelection selection_model {
+              model: Gio.ListStore workspaces_store {
+                item-type: typeof<GObject.Object>;
+              };
             };
-          };
 
-          factory: SignalListItemFactory {
-            bind => $_on_item_bind();
-            setup => $_on_item_setup();
-          };
+            factory: SignalListItemFactory {
+              bind => $_on_item_bind();
+              setup => $_on_item_setup();
+            };
+          }
         }
       };
     }
