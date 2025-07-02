@@ -27,51 +27,7 @@ from typing import Dict, List, Optional, Self
 from gi.repository import GLib, GObject, Gom
 from loguru import logger
 
-from norka.models import DatabaseManager, get_database_manager
-from norka.models.page import Page
-
-
-class PageNode:
-    """
-    Represents a page node in a tree structure.
-    
-    This helper class is used to build and represent the hierarchical
-    structure of pages within a workspace.
-    """
-    
-    def __init__(self, page: Page):
-        self.page = page
-        self.children: List[PageNode] = []
-        self.parent: Optional[PageNode] = None
-    
-    def add_child(self, child_node: 'PageNode'):
-        """Add a child node to this page node."""
-        child_node.parent = self
-        self.children.append(child_node)
-        # Sort children by sort_order and then by title
-        self.children.sort(key=lambda x: (x.page.sort_order, x.page.title))
-    
-    def get_depth(self) -> int:
-        """Get the depth of this node in the tree (root = 0)."""
-        depth = 0
-        current = self.parent
-        while current:
-            depth += 1
-            current = current.parent
-        return depth
-    
-    def to_dict(self, include_children: bool = True) -> dict:
-        """Convert node to dictionary representation."""
-        result = self.page.to_dict()
-        result['depth'] = self.get_depth()
-        
-        if include_children:
-            result['children'] = [child.to_dict() for child in self.children]
-        else:
-            result['has_children'] = len(self.children) > 0
-            result['children_count'] = len(self.children)
-        
-        return result
+from norka.models import DatabaseManager, Page, PageNode, get_database_manager
 
 
 class PageService(GObject.Object):
@@ -83,7 +39,11 @@ class PageService(GObject.Object):
         "page-created": (GObject.SIGNAL_RUN_FIRST, None, (Page,)),
         "page-updated": (GObject.SIGNAL_RUN_FIRST, None, (Page,)),
         "page-deleted": (GObject.SIGNAL_RUN_FIRST, None, (Page, bool)),
-        "page-moved": (GObject.SIGNAL_RUN_FIRST, None, (Page, str, str)),  # page, old_parent_id, new_parent_id
+        "page-moved": (
+            GObject.SIGNAL_RUN_FIRST,
+            None,
+            (Page, str, str),
+        ),  # page, old_parent_id, new_parent_id
         "page-tree-changed": (GObject.SIGNAL_RUN_FIRST, None, (str,)),  # workspace_id
     }
 
@@ -227,7 +187,7 @@ class PageService(GObject.Object):
 
         if page:
             workspace_id = page.workspace_id
-            
+
             # First delete all child pages recursively
             children = self.get_child_pages(page_id)
             for child in children:
@@ -255,7 +215,9 @@ class PageService(GObject.Object):
         """
         workspace_filter = Gom.Filter.new_eq(Page, "workspace_id", workspace_id)
         sorting = Gom.Sorting(Page, "sort_order", Gom.SortingMode.ASCENDING)
-        group = self._database.repository.find_sorted_sync(Page, workspace_filter, sorting)
+        group = self._database.repository.find_sorted_sync(
+            Page, workspace_filter, sorting
+        )
         count = len(group)
         group.fetch_sync(0, count)
         return list(group)
@@ -274,8 +236,10 @@ class PageService(GObject.Object):
         parent_filter = Gom.Filter.new_is_null(Page, "parent_page_id")
         combined_filter = Gom.Filter.new_and(workspace_filter, parent_filter)
         sorting = Gom.Sorting(Page, "sort_order", Gom.SortingMode.ASCENDING)
-        
-        group = self._database.repository.find_sorted_sync(Page, combined_filter, sorting)
+
+        group = self._database.repository.find_sorted_sync(
+            Page, combined_filter, sorting
+        )
         count = len(group)
         group.fetch_sync(0, count)
         return list(group)
@@ -292,7 +256,7 @@ class PageService(GObject.Object):
         """
         parent_filter = Gom.Filter.new_eq(Page, "parent_page_id", parent_page_id)
         sorting = Gom.Sorting(Page, "sort_order", Gom.SortingMode.ASCENDING)
-        
+
         group = self._database.repository.find_sorted_sync(Page, parent_filter, sorting)
         count = len(group)
         group.fetch_sync(0, count)
@@ -310,17 +274,17 @@ class PageService(GObject.Object):
         """
         # Get all pages in the workspace
         all_pages = self.get_workspace_pages(workspace_id)
-        
+
         # Create a map of page_id -> PageNode
         node_map: Dict[str, PageNode] = {}
         for page in all_pages:
             node_map[page.id] = PageNode(page)
-        
+
         # Build the tree structure
         root_nodes = []
         for page in all_pages:
             node = node_map[page.id]
-            
+
             if page.parent_page_id and page.parent_page_id in node_map:
                 # This page has a parent, add it as a child
                 parent_node = node_map[page.parent_page_id]
@@ -328,10 +292,10 @@ class PageService(GObject.Object):
             else:
                 # This is a root page
                 root_nodes.append(node)
-        
+
         # Sort root nodes by sort_order and title
         root_nodes.sort(key=lambda x: (x.page.sort_order, x.page.title))
-        
+
         return root_nodes
 
     def get_page_ancestors(self, page_id: str) -> List[Page]:
@@ -347,10 +311,10 @@ class PageService(GObject.Object):
         page = self.get_page(page_id)
         if not page:
             return []
-        
+
         ancestors = []
         current_page = page
-        
+
         # Get parent chain
         while current_page and current_page.parent_page_id:
             parent = self.get_page(current_page.parent_page_id)
@@ -359,7 +323,7 @@ class PageService(GObject.Object):
                 current_page = parent
             else:
                 break
-        
+
         return ancestors
 
     def move_page(self, page_id: str, new_parent_id: Optional[str]) -> bool:
@@ -376,17 +340,19 @@ class PageService(GObject.Object):
         page = self.get_page(page_id)
         if not page:
             return False
-        
+
         # Prevent moving a page to be a child of itself or its descendants
         if new_parent_id and self._is_descendant(new_parent_id, page_id):
-            logger.warning("Cannot move page {} to its descendant {}", page_id, new_parent_id)
+            logger.warning(
+                "Cannot move page {} to its descendant {}", page_id, new_parent_id
+            )
             return False
-        
+
         old_parent_id = page.parent_page_id
         page.parent_page_id = new_parent_id
         page.update_access_time()
         page.save_sync()
-        
+
         self.emit("page-moved", page, old_parent_id or "", new_parent_id or "")
         self.emit("page-tree-changed", page.workspace_id)
         return True
@@ -417,12 +383,12 @@ class PageService(GObject.Object):
         """
         descendants = set()
         children = self.get_child_pages(page_id)
-        
+
         for child in children:
             descendants.add(child.id)
             # Recursively get descendants
             descendants.update(self._get_all_descendants(child.id))
-        
+
         return descendants
 
     # Utility Methods
@@ -441,8 +407,10 @@ class PageService(GObject.Object):
         favorite_filter = Gom.Filter.new_eq(Page, "is_favorite", True)
         combined_filter = Gom.Filter.new_and(workspace_filter, favorite_filter)
         sorting = Gom.Sorting(Page, "updated_at", Gom.SortingMode.DESCENDING)
-        
-        group = self._database.repository.find_sorted_sync(Page, combined_filter, sorting)
+
+        group = self._database.repository.find_sorted_sync(
+            Page, combined_filter, sorting
+        )
         count = len(group)
         group.fetch_sync(0, count)
         return list(group)
@@ -462,8 +430,10 @@ class PageService(GObject.Object):
         archived_filter = Gom.Filter.new_eq(Page, "is_archived", False)
         combined_filter = Gom.Filter.new_and(workspace_filter, archived_filter)
         sorting = Gom.Sorting(Page, "last_accessed", Gom.SortingMode.DESCENDING)
-        
-        group = self._database.repository.find_sorted_sync(Page, combined_filter, sorting)
+
+        group = self._database.repository.find_sorted_sync(
+            Page, combined_filter, sorting
+        )
         count = min(len(group), limit)
         group.fetch_sync(0, count)
         return list(group)[:limit]
@@ -483,13 +453,14 @@ class PageService(GObject.Object):
         # you might want to use full-text search capabilities
         all_pages = self.get_workspace_pages(workspace_id)
         query_lower = query.lower()
-        
+
         matching_pages = []
         for page in all_pages:
-            if (query_lower in page.title.lower() or 
-                (page.text and query_lower in page.text.lower())):
+            if query_lower in page.title.lower() or (
+                page.text and query_lower in page.text.lower()
+            ):
                 matching_pages.append(page)
-        
+
         return matching_pages
 
     def toggle_page_favorite(self, page_id: str) -> Optional[Page]:

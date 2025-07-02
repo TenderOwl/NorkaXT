@@ -38,11 +38,18 @@ class Sidebar(Adw.Bin):
 
     _workspace: Workspace | None
 
+    __gsignals__ = {
+        "page-selected": (GObject.SIGNAL_RUN_FIRST, None, (Page,)),
+    }
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
         self._page_service = PageService.get_default()
         self._page_service.connect("page-created", self._on_page_created)
+        
+        # Connect to pages tree signals
+        self.pages_tree.connect("page-selected", self._on_page_selected)
 
     @GObject.Property
     def workspace(self):
@@ -58,9 +65,20 @@ class Sidebar(Adw.Bin):
         GLib.idle_add(self._get_page_tree)
 
     def _get_page_tree(self):
-        pages_tree = self._page_service.get_page_tree(self._workspace.id)
-
-        logger.debug("Pages Tree: {}", pages_tree)
+        page_nodes = self._page_service.get_page_tree(self._workspace.id)
+        
+        logger.debug("Pages Tree: {}", page_nodes)
+        
+        # Populate the tree widget with the page nodes
+        self.pages_tree.populate_tree(page_nodes)
 
     def _on_page_created(self, sender, page: Page):
         logger.debug("Page created: {}", page)
+        # Refresh the tree when a new page is created
+        if self._workspace:
+            GLib.idle_add(self._get_page_tree)
+    
+    def _on_page_selected(self, sender, page: Page):
+        logger.debug("Page selected: {}", page)
+        # Emit the signal to parent widgets
+        self.emit("page-selected", page)

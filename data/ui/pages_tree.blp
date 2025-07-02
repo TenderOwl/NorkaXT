@@ -11,19 +11,17 @@ template $PagesTree: Box {
       show-separators: false;
       enable-rubberband: false;
 
+      styles ["navigation-sidebar"]
+
       model: SingleSelection selection {
         autoselect: false;
         selection-changed => $_on_selection_changed();
       };
 
       factory: SignalListItemFactory factory {
-        setup => $_on_item_setup();
-        bind => $_on_item_bind();
+        setup => $_on_item_setup_template();
+        bind => $_on_item_bind_template();
       };
-
-      styles [
-        "navigation-sidebar",
-      ]
 
       EventControllerMotion {
         enter => $_on_mouse_enter();

@@ -22,18 +22,37 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .database import DatabaseManager, close_database, get_database_manager
-from .page import Page
-from .page_node import PageNode
-from .page_tree_item import PageTreeItem
-from .workspace import Workspace
+from gi.repository import GObject
 
-__all__ = [
-    "Workspace",
-    "Page",
-    "DatabaseManager",
-    "get_database_manager",
-    "close_database",
-    "PageNode",
-    "PageTreeItem",
-]
+from norka.models import PageNode
+
+
+class PageTreeItem(GObject.Object):
+    """
+    Wrapper class for PageNode to work with Gtk.TreeListModel.
+    This represents a single item in the tree structure.
+    """
+
+    def __init__(self, page_node: PageNode):
+        super().__init__()
+        self._page_node = page_node
+
+    @GObject.Property
+    def page_node(self) -> PageNode:
+        return self._page_node
+
+    @GObject.Property
+    def title(self) -> str:
+        return self._page_node.page.title
+
+    @GObject.Property
+    def icon(self) -> str:
+        return self._page_node.page.icon or "📄"
+
+    @GObject.Property
+    def has_children(self) -> bool:
+        return len(self._page_node.children) > 0
+
+    @GObject.Property
+    def children_count(self) -> int:
+        return len(self._page_node.children)
