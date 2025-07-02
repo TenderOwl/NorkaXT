@@ -3,11 +3,12 @@ using Gtk 4.0;
 
 template $WorkspaceCard : Box {
   orientation: vertical;
-  styles ["card"]
   margin-start: 6;
   margin-end: 6;
   margin-bottom: 6;
   margin-top: 6;
+
+  styles [ "card", "workspace-card"]
 
   Picture cover {
     content-fit: cover;
@@ -24,10 +25,6 @@ template $WorkspaceCard : Box {
     margin-end: 6;
     margin-bottom: 8;
     margin-top: 8;
-
-    // Label icon {
-    //   width-request: 32;
-    // }
 
     Label title {
       ellipsize: end;

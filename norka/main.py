@@ -26,7 +26,7 @@ import sys
 from gettext import gettext as _
 
 from gi.events import GLibEventLoopPolicy
-from gi.repository import Adw, Gio, GLib
+from gi.repository import Adw, Gdk, Gio, GLib, Gtk
 from loguru import logger
 
 from norka.services import WorkspaceService
@@ -37,7 +37,7 @@ class NorkaApplication(Adw.Application):
     """The main application singleton class."""
 
     _workspace_service: WorkspaceService | None = None
-    _profile: str = ''
+    _profile: str = ""
 
     def __init__(self, version: str, profile: str):
         super().__init__(
@@ -75,6 +75,13 @@ class NorkaApplication(Adw.Application):
     def do_startup(self):
         Adw.Application.do_startup(self)
         self._workspace_service = WorkspaceService.get_default()
+
+        css_provider = Gtk.CssProvider()
+        css_provider.load_from_resource("/com/tenderowl/norka/general.css")
+        if display := Gdk.Display.get_default():
+            Gtk.StyleContext.add_provider_for_display(
+                display, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+            )
 
     def on_about_action(self, *args):
         """Callback for the app.about action."""

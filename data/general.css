@@ -1,0 +1,4 @@
+
+.workspace-card modelbutton:last-child {
+  color: var(--error-color);
+}
