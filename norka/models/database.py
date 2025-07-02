@@ -27,6 +27,7 @@ from typing import Optional
 
 from gi.repository import GLib, GObject, Gom
 
+from .page import Page
 from .workspace import Workspace
 
 
@@ -68,7 +69,7 @@ class DatabaseManager:
 
         # Create the table
         self._repository = Gom.Repository(adapter=self._adapter)
-        self._repository.automatic_migrate_sync(1, [Workspace])
+        self._repository.automatic_migrate_sync(1, [Workspace, Page])
 
     @property
     def database_path(self):

@@ -27,7 +27,7 @@ from gi.repository import Gio, GLib, GObject, Gtk
 from loguru import logger
 
 from norka.models.workspace import Workspace
-from norka.models.workspace_service import WorkspaceService
+from norka.services import WorkspaceService
 from norka.widgets.workspace_card import WorkspaceCard
 
 EMPTY_STACK_PAGE = "empty-view"

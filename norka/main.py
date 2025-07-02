@@ -29,7 +29,7 @@ from gi.events import GLibEventLoopPolicy
 from gi.repository import Adw, Gio, GLib
 from loguru import logger
 
-from norka.models.workspace_service import WorkspaceService
+from norka.services import WorkspaceService
 from norka.window import NorkaWindow
 
 

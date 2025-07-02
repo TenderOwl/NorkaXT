@@ -23,6 +23,13 @@
 # SPDX-License-Identifier: MIT
 
 from .database import DatabaseManager, close_database, get_database_manager
+from .page import Page
 from .workspace import Workspace
 
-__all__ = ["Workspace", "DatabaseManager", "get_database_manager", "close_database"]
+__all__ = [
+    "Workspace",
+    "Page",
+    "DatabaseManager",
+    "get_database_manager",
+    "close_database",
+]

@@ -26,7 +26,7 @@ from gi.repository import Adw, Gio, GLib, Gtk
 from loguru import logger
 
 from norka.models import Workspace
-from norka.models.workspace_service import WorkspaceService
+from norka.services import WorkspaceService
 from norka.widgets.add_workspace_dialog import AddWorkspaceDialog
 from norka.widgets.content_page import ContentPage
 from norka.widgets.workspace_view import WorkspaceView
