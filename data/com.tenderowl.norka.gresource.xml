@@ -6,6 +6,7 @@
         <file preprocess="xml-stripblanks">ui/help-overlay.ui</file>
         <file preprocess="xml-stripblanks">ui/sidebar.ui</file>
         <file preprocess="xml-stripblanks">ui/pages_tree.ui</file>
+        <file preprocess="xml-stripblanks">ui/pages_tree_row.ui</file>
         <file preprocess="xml-stripblanks">ui/workspace_view.ui</file>
         <file preprocess="xml-stripblanks">ui/workspace_card.ui</file>
         <file preprocess="xml-stripblanks">ui/add_workspace_dialog.ui</file>

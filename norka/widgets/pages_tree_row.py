@@ -21,38 +21,16 @@
 # SOFTWARE.
 #
 # SPDX-License-Identifier: MIT
-
-from gi.repository import GObject
-
-from norka.models.page_node import PageNode
+from gi.repository import Gtk
 
 
-class PageTreeItem(GObject.Object):
-    """
-    Wrapper class for PageNode to work with Gtk.TreeListModel.
-    This represents a single item in the tree structure.
-    """
+@Gtk.Template(resource_path="/com/tenderowl/norka/ui/pages_tree_row.ui")
+class PagesTreeRow(Gtk.TreeExpander):
+    __gtype_name__ = "PagesTreeRow"
 
-    def __init__(self, page_node: PageNode):
-        super().__init__()
-        self._page_node = page_node
+    content_box: Gtk.Box = Gtk.Template.Child()
+    icon_label: Gtk.Label = Gtk.Template.Child()
+    title_label: Gtk.Label = Gtk.Template.Child()
 
-    @GObject.Property
-    def page_node(self) -> PageNode:
-        return self._page_node
-
-    @GObject.Property
-    def title(self) -> str:
-        return self._page_node.page.title
-
-    @GObject.Property
-    def icon(self) -> str:
-        return self._page_node.page.icon or "📄"
-
-    @GObject.Property
-    def has_children(self) -> bool:
-        return len(self._page_node.children) > 0
-
-    @GObject.Property
-    def children_count(self) -> int:
-        return len(self._page_node.children)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)

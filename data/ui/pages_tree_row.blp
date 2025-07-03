@@ -1,0 +1,20 @@
+using Gtk 4.0;
+
+template $PagesTreeRow: TreeExpander {
+  Box content_box {
+    spacing: 6;
+    margin-top: 3;
+    margin-bottom: 3;
+
+    Label icon_label {
+      name: "icon-label";
+    }
+
+    Label title_label {
+      name: "title-label";
+      hexpand: true;
+      xalign: 0.0;
+      ellipsize: end;
+    }
+  }
+}

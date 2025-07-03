@@ -28,6 +28,7 @@ from gi.repository import Gio, GObject, Gtk
 from loguru import logger
 
 from norka.models import Page, PageNode, PageTreeItem
+from norka.widgets.pages_tree_row import PagesTreeRow
 
 
 @Gtk.Template(resource_path="/com/tenderowl/norka/ui/pages_tree.ui")
@@ -119,43 +120,12 @@ class PagesTree(Gtk.Box):
         return child_model
 
     def _on_item_setup(
-        self, factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
+        self, _factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
     ):
         """
         Setup callback for list items. Creates the UI structure.
         """
-        # Create a TreeExpander widget
-        expander = Gtk.TreeExpander()
-
-        # Create the content box for the tree item
-        content_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
-        content_box.set_margin_start(6)
-        content_box.set_margin_end(6)
-        content_box.set_margin_top(3)
-        content_box.set_margin_bottom(3)
-
-        # Icon label
-        icon_label = Gtk.Label()
-        icon_label.set_name("icon-label")
-        content_box.append(icon_label)
-
-        # Title label
-        title_label = Gtk.Label()
-        title_label.set_name("title-label")
-        title_label.set_hexpand(True)
-        title_label.set_xalign(0.0)
-        title_label.set_ellipsize(3)  # ELLIPSIZE_END
-        content_box.append(title_label)
-
-        # Set the content as the child of the expander
-        expander.set_child(content_box)
-
-        # Store references for binding
-        expander.icon_label = icon_label
-        expander.title_label = title_label
-
-        # Set the expander as the list item child
-        list_item.set_child(expander)
+        list_item.set_child(PagesTreeRow())
 
     def _on_item_bind(
         self, factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
@@ -164,48 +134,46 @@ class PagesTree(Gtk.Box):
         Bind callback for list items. Connects data to the UI.
         """
         # Get the tree list row (contains position info and item)
-        tree_list_row = list_item.get_item()
+        tree_list_row: Gtk.TreeListRow = list_item.get_item()
         if not tree_list_row:
             return
 
         # Get the actual PageTreeItem
-        page_tree_item = tree_list_row.get_item()
+        page_tree_item: PageTreeItem = tree_list_row.get_item()
         if not page_tree_item:
             return
 
         # Get the expander widget
-        expander = list_item.get_child()
-        if not expander:
+        child: PagesTreeRow = list_item.get_child()
+        if not child:
             return
 
         # Set the tree list row on the expander (for expand/collapse functionality)
-        expander.set_list_row(tree_list_row)
+        child.set_list_row(tree_list_row)
 
         # Bind the data to the UI elements
-        expander.icon_label.set_text(page_tree_item.icon)
-        expander.title_label.set_text(page_tree_item.title)
+        child.icon_label.set_text(page_tree_item.icon)
+        child.title_label.set_text(page_tree_item.title)
 
         # Add CSS classes for styling
-        content_box = expander.get_child()
         if page_tree_item.has_children:
-            content_box.add_css_class("tree-item-expandable")
+            child.content_box.add_css_class("tree-item-expandable")
         else:
-            content_box.add_css_class("tree-item-leaf")
+            child.content_box.add_css_class("tree-item-leaf")
 
     def _on_item_unbind(
-        self, factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
+        self, _factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
     ):
         """
         Unbind callback for list items. Clean up when items are recycled.
         """
-        expander = list_item.get_child()
-        if expander:
+        child: PagesTreeRow = list_item.get_child()
+        if child:
             # Clear the list row reference
-            expander.set_list_row(None)
+            child.set_list_row(None)
 
             # Remove CSS classes
-            content_box = expander.get_child()
-            if content_box:
+            if content_box := child.get_child():
                 content_box.remove_css_class("tree-item-expandable")
                 content_box.remove_css_class("tree-item-leaf")
 
@@ -221,7 +189,7 @@ class PagesTree(Gtk.Box):
             return
 
         # Get the PageTreeItem from the tree list row
-        page_tree_item = selected_item.get_item()
+        page_tree_item: PageTreeItem = selected_item.get_item()
         if not page_tree_item:
             return
 
@@ -274,7 +242,7 @@ class PagesTree(Gtk.Box):
         if not selected_item:
             return None
 
-        page_tree_item = selected_item.get_item()
+        page_tree_item: PageTreeItem = selected_item.get_item()
         if not page_tree_item:
             return None
 

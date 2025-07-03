@@ -68,3 +68,6 @@ class PageNode:
             result["children_count"] = len(self.children)
 
         return result
+
+    def __repr__(self):
+        return f"PageNode({self.page})"
