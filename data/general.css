@@ -5,9 +5,9 @@
 .bglogo {
   background-image: url("resource:///com/tenderowl/norka/icons/otter.png");
   background-position: left bottom;
-  background-size: 128px;
+  background-size: 256px;
   background-repeat: no-repeat;
-  transform: rotate(-18deg);
+  transform: rotate(-8deg);
   opacity: 0.1;
 }
 
@@ -32,4 +32,10 @@
   border-radius: calc(12px * 1.5 - var(--editor-margin));
   margin-top: var(--editor-margin);
   margin-bottom: var(--editor-margin);
+
+  /* UI settings.
+   * TODO: Configure via Settings in ap
+   */
+  font-family: "Noto Sans";
+  line-height: 150%;
 }

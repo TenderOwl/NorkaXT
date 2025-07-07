@@ -110,6 +110,7 @@ class WorkspaceCard(Gtk.Box):
         #     self.icon.set_visible(False)
         self.title.set_label(workspace.name_with_icon)
         self.updated_at.set_label(humanize.naturaldate(workspace.last_accessed_dt))
+        self.updated_at.set_tooltip_text(workspace.last_accessed_dt.strftime("%Y-%m-%d %H:%M:%S"))
 
     @Gtk.Template.Callback()
     def _on_context_menu(self, controller, button, x, y):
