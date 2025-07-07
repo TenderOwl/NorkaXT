@@ -4,6 +4,8 @@
 
 NorkaXT is a modern, feature-rich note-taking application built with Python and GTK. It provides a clean, distraction-free writing environment with powerful organization features.
 
+![norka-xt-screenshot.png](data/screenshots/norka-xt-screenshot.png)
+
 ## 🌟 Features
 
 - **Workspace Management**: Organize your notes into different workspaces
