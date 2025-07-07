@@ -29,7 +29,7 @@
 .sourceview {
   /* color: var(--view-fg-color); */
   /* background-color: var(--view-bg-color); */
-  border-radius: calc(12px - var(--editor-margin));
+  border-radius: calc(12px * 1.5 - var(--editor-margin));
   margin-top: var(--editor-margin);
   margin-bottom: var(--editor-margin);
 }

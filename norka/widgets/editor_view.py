@@ -21,7 +21,7 @@
 # SOFTWARE.
 #
 # SPDX-License-Identifier: MIT
-from gi.repository import Gdk, GLib, GObject, Gtk, GtkSource
+from gi.repository import Gdk, GLib, GObject, Gtk, GtkSource, Adw
 from loguru import logger
 
 from norka.models import Page
@@ -72,6 +72,19 @@ class EditorView(Gtk.Box):
         self._buffer.set_text(page.text)
         # And start the save timer for automatic saving
         self._save_timer = GLib.timeout_add_seconds(5, self._save_page)
+
+        self._apply_styling()
+
+    def _apply_styling(self) -> None:
+        style_manager = Adw.StyleManager.get_default()
+        style_scheme_manager = GtkSource.StyleSchemeManager.get_default()
+
+        scheme_id = "norka"
+        if style_manager.get_dark():
+            scheme_id = f"{scheme_id}-dark"
+
+        scheme = style_scheme_manager.get_scheme(scheme_id)
+        self._buffer.set_style_scheme(scheme)
 
     @Gtk.Template.Callback
     def _on_key_pressed(

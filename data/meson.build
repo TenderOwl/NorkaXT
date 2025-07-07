@@ -25,7 +25,6 @@ gnome.compile_resources(app_id,
   install_dir: pkgdatadir,
 )
 
-
 desktop_file = i18n.merge_file(
         input: app_id + '.desktop.in',
        output: app_id + '.desktop',
@@ -72,3 +71,10 @@ configure_file(
 )
 
 subdir('icons')
+
+install_data(
+    'gtksourceview-5/styles/norka.xml',
+    'gtksourceview-5/styles/norka-dark.xml',
+    'gtksourceview-5/styles/norka-sepia.xml',
+    install_dir: get_option('datadir') / 'gtksourceview-5' / 'styles'
+)
