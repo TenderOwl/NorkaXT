@@ -163,7 +163,7 @@ class PagesTree(Gtk.Box):
             return
 
         # Set the tree list row on the expander (for expand/collapse functionality)
-        child.set_list_row(tree_list_row)
+        child.expander.set_list_row(tree_list_row)
 
         # Bind the data to the UI elements
         child.icon_label.set_text(page_tree_item.icon)
@@ -172,9 +172,9 @@ class PagesTree(Gtk.Box):
 
         # Add CSS classes for styling
         if page_tree_item.has_children:
-            child.content_box.add_css_class("tree-item-expandable")
+            child.add_css_class("tree-item-expandable")
         else:
-            child.content_box.add_css_class("tree-item-leaf")
+            child.add_css_class("tree-item-leaf")
 
     def _on_item_unbind(
             self, _factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
@@ -185,12 +185,11 @@ class PagesTree(Gtk.Box):
         child: PagesTreeRow = list_item.get_child()
         if child:
             # Clear the list row reference
-            child.set_list_row(None)
+            child.expander.set_list_row(None)
 
             # Remove CSS classes
-            if content_box := child.get_child():
-                content_box.remove_css_class("tree-item-expandable")
-                content_box.remove_css_class("tree-item-leaf")
+            child.remove_css_class("tree-item-expandable")
+            child.remove_css_class("tree-item-leaf")
 
     def _on_item_drag_prepare(self, ev_drag: Gtk.DragSource, x: int, y: int):
         """

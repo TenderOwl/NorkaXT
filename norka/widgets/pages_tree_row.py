@@ -28,10 +28,11 @@ from norka.models import PageTreeItem
 
 
 @Gtk.Template(resource_path="/com/tenderowl/norka/ui/pages_tree_row.ui")
-class PagesTreeRow(Gtk.TreeExpander):
+class PagesTreeRow(Gtk.Box):
     __gtype_name__ = "PagesTreeRow"
 
-    content_box: Gtk.Box = Gtk.Template.Child()
+    # content_box: Gtk.Box = Gtk.Template.Child()
+    expander: Gtk.TreeExpander = Gtk.Template.Child()
     icon_label: Gtk.Label = Gtk.Template.Child()
     title_label: Gtk.Label = Gtk.Template.Child()
 
