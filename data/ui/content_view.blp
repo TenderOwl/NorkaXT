@@ -9,16 +9,29 @@ template $ContentView : Adw.Bin {
       show-title: false;
 
       [start]
-      Button {
-        icon-name: 'list-add-symbolic';
-        clicked => $_on_add_btn_clicked();
+      ToggleButton toggle_sidebar_btn {
+        icon-name: 'sidebar-show-symbolic';
+        action-name: "win.toggle-sidebar";
       }
     }
 
+    Adw.ViewStack view_stack {
 
-    Adw.Clamp {
+      Adw.ViewStackPage {
+        name: "empty-view";
 
-      FlowBox flow_box {}
+        child: Adw.StatusPage {
+          icon-name: "com.tenderowl.norka";
+          title: _("Create or Select Page to edit");
+        };
+      }
+
+      Adw.ViewStackPage {
+        name: "editor-view";
+
+        child: $EditorView editor_view {};
+      }
     }
+
   }
 }

@@ -14,8 +14,7 @@ template $PagesTree: Box {
       styles ["navigation-sidebar"]
 
       model: SingleSelection selection {
-        autoselect: true;
-        selection-changed => $_on_selection_changed();
+        autoselect: false;
       };
 
       factory: SignalListItemFactory factory {

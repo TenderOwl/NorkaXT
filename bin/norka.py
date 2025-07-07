@@ -37,6 +37,7 @@ from constants import *
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 gi.require_version("Gom", "1.0")
+gi.require_version("GtkSource", "5")
 
 sys.path.insert(1, pkgdatadir)
 signal.signal(signal.SIGINT, signal.SIG_DFL)

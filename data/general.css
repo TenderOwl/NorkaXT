@@ -1,3 +1,7 @@
+:root {
+  --editor-margin: 8px;
+}
+
 
 .workspace-card modelbutton:last-child {
   color: var(--error-color);
@@ -12,4 +16,12 @@
 .drag-active {
     outline: 1px dotted var(--accent-fg-color);
     outline-offset: -2px;
+}
+
+.sourceview {
+  /* color: var(--view-fg-color); */
+  /* background-color: var(--view-bg-color); */
+  border-radius: calc(12px - var(--editor-margin));
+  margin-top: var(--editor-margin);
+  margin-bottom: var(--editor-margin);
 }

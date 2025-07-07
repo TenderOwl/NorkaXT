@@ -83,3 +83,4 @@ class Sidebar(Adw.Bin):
         logger.debug("Page selected: {}", page)
         # Emit the signal to parent widgets
         self.emit("page-selected", page)
+        self.activate_action("win.open-page", GLib.Variant.new_string(page.id))

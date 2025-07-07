@@ -21,32 +21,47 @@
 # SOFTWARE.
 #
 # SPDX-License-Identifier: MIT
-
-from gi.repository import Adw, Gtk
+from gi.repository import Gdk, GObject, Gtk, GtkSource
 
 from norka.models import Page
-from norka.widgets.editor_view import EditorView
 
-EMPTY_STACK_PAGE = "empty-view"
-EDITOR_STACK_PAGE = "editor-view"
 
-@Gtk.Template(resource_path="/com/tenderowl/norka/ui/content_view.ui")
-class ContentView(Adw.Bin):
-    __gtype_name__ = "ContentView"
+@Gtk.Template(resource_path="/com/tenderowl/norka/ui/editor_view.ui")
+class EditorView(Gtk.Box):
+    __gtype_name__ = "EditorView"
 
-    view_stack: Adw.ViewStack = Gtk.Template.Child()
-    editor_view: EditorView = Gtk.Template.Child()
+    text_view: GtkSource.View = Gtk.Template.Child()
+    _buffer: GtkSource.Buffer
+    # completion: GtkSource.Completion = Gtk.Template.Child()
+
+    _page: Page | None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def open_page(self, page: Page):
-        if not page:
-            return
+        language_manager = GtkSource.LanguageManager.get_default()
+        language = language_manager.get_language("markdown")
 
-        self.view_stack.set_visible_child_name(EDITOR_STACK_PAGE)
-        self.editor_view.page = page
+        self._buffer = GtkSource.Buffer()
+        self._buffer.set_language(language)
+        self.text_view.set_buffer(self._buffer)
 
-    def close_page(self):
-        self.view_stack.set_visible_child_name(EMPTY_STACK_PAGE)
-        self.editor_view.page = None
+    @GObject.Property
+    def page(self) -> Page | None:
+        return self._page
+
+    @page.setter
+    def page(self, page: Page | None):
+        self._page = page
+
+        self._buffer.set_text(page.text)
+
+    @Gtk.Template.Callback
+    def _on_key_pressed(
+        self,
+        controller: Gtk.EventControllerKey,
+        keyval: int,
+        keycode: int,
+        state: Gdk.ModifierType,
+    ) -> bool:
+        return Gdk.EVENT_PROPAGATE

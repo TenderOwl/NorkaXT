@@ -28,6 +28,7 @@
     "*.a"
   ],
   "modules": [
+    "gtksource.json",
     "blueprint-compiler.json",
     "python3-modules.json",
     {

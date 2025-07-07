@@ -51,6 +51,8 @@ class ContentPage(Adw.BreakpointBin):
 
         self.install_action("win.create-page", None, self._on_create_page_action)
 
+        self.install_action("win.open-page", "s", self._on_open_page_action)
+
     @GObject.Property
     def workspace(self) -> Workspace | None:
         return self._workspace
@@ -70,6 +72,18 @@ class ContentPage(Adw.BreakpointBin):
         if self._workspace and self._page_service:
             GLib.idle_add(self._create_page)
 
+    def _on_open_page_action(
+        self, _sender: Gtk.Widget, _action: str, page_id: GLib.Variant = None
+    ):
+        logger.debug("Open page action activated: {}", page_id.get_string())
+        GLib.idle_add(self._open_page, page_id.get_string())
+
     def _create_page(self):
         self._page_service.create_page(self._workspace.id, _("Untitled"), "")
+        return False
+
+    def _open_page(self, page_id: str):
+        if page := self._page_service.get_page(page_id):
+            self.content_view.open_page(page)
+
         return False

@@ -13,6 +13,7 @@
         <file preprocess="xml-stripblanks">ui/edit_workspace_dialog.ui</file>
         <file preprocess="xml-stripblanks">ui/content_page.ui</file>
         <file preprocess="xml-stripblanks">ui/content_view.ui</file>
+        <file preprocess="xml-stripblanks">ui/editor_view.ui</file>
     </gresource>
     <gresource prefix="/com/tenderowl/norka/covers">
         <file alias="cover-1">covers/cover-1.jpg</file>

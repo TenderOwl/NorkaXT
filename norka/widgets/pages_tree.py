@@ -54,6 +54,8 @@ class PagesTree(Gtk.Box):
         self.factory.connect("bind", self._on_item_bind)
         self.factory.connect("unbind", self._on_item_unbind)
 
+        self.selection.connect("selection-changed", self._on_selection_changed)
+
         self.list_view.add_css_class("navigation-sidebar")
 
     def populate_tree(self, page_nodes: list[PageNode]):
@@ -254,13 +256,14 @@ class PagesTree(Gtk.Box):
         logger.debug("DropTarget leave: {}", ev_drop.get_widget())
         widget.remove_css_class("drag-active")
 
-    @Gtk.Template.Callback
+    # @Gtk.Template.Callback
     def _on_selection_changed(
             self, selection: Gtk.SingleSelection, position: int, n_items: int
     ):
         """
         Handle selection changes in the tree.
         """
+        logger.debug("Selection changed: {} items selected", n_items)
         selected_item = selection.get_selected_item()
         if not selected_item:
             return
