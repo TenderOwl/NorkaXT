@@ -24,10 +24,11 @@
 
 from typing import Optional
 
-from gi.repository import Gio, GObject, Gtk, Gdk
+from gi.repository import Gio, GObject, Gtk, Gdk, GLib
 from loguru import logger
 
 from norka.models import Page, PageNode, PageTreeItem
+from norka.services import WorkspaceService, PageService
 from norka.widgets.pages_tree_row import PagesTreeRow
 
 
@@ -126,9 +127,18 @@ class PagesTree(Gtk.Box):
         Setup callback for list items. Creates the UI structure.
         """
         child = PagesTreeRow()
-        ev_drag = Gtk.DragSource(actions=Gdk.DragAction.COPY)
+        ev_drag = Gtk.DragSource(actions=Gdk.DragAction.MOVE)
         ev_drag.connect('prepare', self._on_item_drag_prepare)
+        ev_drag.connect('drag-begin', self._on_item_drag_begin)
         child.add_controller(ev_drag)
+
+        ev_drop = Gtk.DropTarget(actions=Gdk.DragAction.MOVE)
+        ev_drop.set_gtypes([GObject.TYPE_PYOBJECT, Gdk.FileList, str])
+        ev_drop.connect('drop', self._on_item_drag_drop)
+        ev_drop.connect('enter', self._on_item_drop_enter)
+        ev_drop.connect('leave', self._on_item_drop_leave)
+        child.add_controller(ev_drop)
+        child.add_css_class("pages-tree-row")
         list_item.set_child(child)
 
     def _on_item_bind(
@@ -197,6 +207,47 @@ class PagesTree(Gtk.Box):
             logger.error("Failed to set drag cursor: {}", e)
 
         return None
+
+    def _on_item_drag_begin(self, controller: Gtk.DragSource, _drag):
+        icon = Gtk.WidgetPaintable.new(controller.get_widget())
+        controller.set_icon(icon, 0, 0)
+
+    def _on_item_drag_drop(self, ev_drop: Gtk.DropTarget, drop: Gdk.Drop, _x: int, _y: int):
+        """
+        Handle drag drop event.
+
+        Match drop value to either a list of files or a string.
+        Files should be imported and set as the children of the current page.
+        Strings are assumed to be page ids and should be used to set the
+        current page as a child of the current page.
+        """
+        match drop:
+            case Gdk.FileList():
+                logger.debug("DropTarget files list: {}", drop)
+            case str():
+                drop_widget = ev_drop.get_widget()
+                item: PageTreeItem = drop_widget.item.page_node
+                logger.debug("Move {} as c child of {}", drop, item)
+                PageService.get_default().move_page(drop, item.page.id)
+
+        return True
+
+    def _on_item_drop_enter(self, ev_drop: Gtk.DropTarget, _x: int, _y: int):
+        """
+        Handle drag enter event and apply drag-active styling.
+        """
+        widget = ev_drop.get_widget().get_parent()
+        logger.debug("DropTarget enter: {}", ev_drop.get_widget())
+        widget.add_css_class("drag-active")
+        return Gdk.DragAction.MOVE
+
+    def _on_item_drop_leave(self, ev_drop: Gtk.DropTarget):
+        """
+        Handle drag leave event and remove drag-active styling.
+        """
+        widget = ev_drop.get_widget().get_parent()
+        logger.debug("DropTarget leave: {}", ev_drop.get_widget())
+        widget.remove_css_class("drag-active")
 
     @Gtk.Template.Callback
     def _on_selection_changed(

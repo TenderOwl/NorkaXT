@@ -8,3 +8,8 @@
   margin-right: 12px;
   background-color: var(--border-color);
 }
+
+.drag-active {
+    outline: 1px dotted var(--accent-fg-color);
+    outline-offset: -2px;
+}

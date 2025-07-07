@@ -47,6 +47,7 @@ class Sidebar(Adw.Bin):
 
         self._page_service = PageService.get_default()
         self._page_service.connect("page-created", self._on_page_created)
+        self._page_service.connect("page-tree-changed", lambda *args: GLib.idle_add(self._get_page_tree))
         
         # Connect to pages tree signals
         self.pages_tree.connect("page-selected", self._on_page_selected)
