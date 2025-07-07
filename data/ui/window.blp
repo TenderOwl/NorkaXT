@@ -40,7 +40,19 @@ template $NorkaWindow: Adw.ApplicationWindow {
             }
            }
 
-           $WorkspaceView workspace_view {}
+          Overlay {
+            child: Box {
+              halign: start;
+              valign: end;
+              margin-bottom: 64;
+              width-request: 366;
+              height-request: 128;
+              styles ["bglogo"]
+            };
+
+            [overlay]
+            $WorkspaceView workspace_view {}
+          }
        };
       }
 

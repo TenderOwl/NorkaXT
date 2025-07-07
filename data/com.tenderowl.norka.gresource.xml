@@ -15,6 +15,9 @@
         <file preprocess="xml-stripblanks">ui/content_view.ui</file>
         <file preprocess="xml-stripblanks">ui/editor_view.ui</file>
     </gresource>
+    <gresource prefix="/com/tenderowl/norka/icons">
+        <file alias="otter.png">icons/otter.png</file>
+    </gresource>
     <gresource prefix="/com/tenderowl/norka/covers">
         <file alias="cover-1">covers/cover-1.jpg</file>
         <file alias="cover-2">covers/cover-2.jpg</file>
@@ -26,3 +29,4 @@
         <file alias="cover-8">covers/cover-8.jpg</file>
     </gresource>
 </gresources>
+

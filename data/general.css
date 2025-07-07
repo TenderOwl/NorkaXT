@@ -2,6 +2,14 @@
   --editor-margin: 8px;
 }
 
+.bglogo {
+  background-image: url("resource:///com/tenderowl/norka/icons/otter.png");
+  background-position: left bottom;
+  background-size: 128px;
+  background-repeat: no-repeat;
+  transform: rotate(-18deg);
+  opacity: 0.1;
+}
 
 .workspace-card modelbutton:last-child {
   color: var(--error-color);
