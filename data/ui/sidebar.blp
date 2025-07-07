@@ -25,44 +25,47 @@ template $Sidebar : Adw.Bin {
     content: Box {
       orientation: vertical;
 
-      // ListBox {
-      //   styles ["navigation-sidebar"]
+      ListBox {
+        styles ["navigation-sidebar"]
+        selection-mode: none;
 
-      //   ListBoxRow {
-      //     Box {
-      //       spacing: 6;
+        ListBoxRow {
+          Box {
+            spacing: 6;
 
-      //       Image {
-      //         icon-name: "starred-symbolic";
-      //       }
+            Image {
+              icon-name: "starred-symbolic";
+            }
 
-      //       Label {
-      //         label: _("Starred");
-      //         xalign: 0;
-      //       }
-      //     }
-      //   }
+            Label {
+              label: _("Starred");
+              xalign: 0;
+            }
+          }
+        }
 
-      //   ListBoxRow {
-      //     Box {
-      //       spacing: 6;
+        ListBoxRow {
+          Box {
+            spacing: 6;
 
-      //       Image {
-      //         icon-name: "system-file-manager-symbolic";
-      //       }
+            Image {
+              icon-name: "system-file-manager-symbolic";
+            }
 
-      //       Label {
-      //         label: _("Archive");
-      //         xalign: 0;
-      //       }
-      //     }
-      //   }
-      // }
+            Label {
+              label: _("Archive");
+              xalign: 0;
+            }
+          }
+        }
+      }
 
-      // Box {
-      //   height-request: 1;
-      //   styles ["divider"]
-      // }
+      Separator {
+        margin-start: 12;
+        margin-end: 12;
+        margin-top: 6;
+        margin-bottom: 6;
+      }
 
       $PagesTree pages_tree {}
     };
