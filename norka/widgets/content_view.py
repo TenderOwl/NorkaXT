@@ -22,7 +22,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from gi.repository import Adw, Gtk
+from gi.repository import Adw, GObject, Gtk
 
 from norka.models import Page
 from norka.widgets.editor_view import EditorView
@@ -30,15 +30,23 @@ from norka.widgets.editor_view import EditorView
 EMPTY_STACK_PAGE = "empty-view"
 EDITOR_STACK_PAGE = "editor-view"
 
+
 @Gtk.Template(resource_path="/com/tenderowl/norka/ui/content_view.ui")
 class ContentView(Adw.Bin):
     __gtype_name__ = "ContentView"
 
+    __gsignals__ = {
+        "save-page": (GObject.SIGNAL_RUN_FIRST, None, (Page,)),
+    }
+
+    toggle_sidebar_btn: Gtk.Button = Gtk.Template.Child()
     view_stack: Adw.ViewStack = Gtk.Template.Child()
     editor_view: EditorView = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        self.editor_view.connect("save-page", self._save_page)
 
     def open_page(self, page: Page):
         if not page:
@@ -50,3 +58,6 @@ class ContentView(Adw.Bin):
     def close_page(self):
         self.view_stack.set_visible_child_name(EMPTY_STACK_PAGE)
         self.editor_view.page = None
+
+    def _save_page(self, sender, page: Page):
+        self.emit("save-page", page)

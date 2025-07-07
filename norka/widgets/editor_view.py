@@ -21,7 +21,8 @@
 # SOFTWARE.
 #
 # SPDX-License-Identifier: MIT
-from gi.repository import Gdk, GObject, Gtk, GtkSource
+from gi.repository import Gdk, GLib, GObject, Gtk, GtkSource
+from loguru import logger
 
 from norka.models import Page
 
@@ -30,11 +31,16 @@ from norka.models import Page
 class EditorView(Gtk.Box):
     __gtype_name__ = "EditorView"
 
+    __gsignals__ = {
+        "save-page": (GObject.SIGNAL_RUN_FIRST, None, (Page,)),
+    }
+
     text_view: GtkSource.View = Gtk.Template.Child()
     _buffer: GtkSource.Buffer
     # completion: GtkSource.Completion = Gtk.Template.Child()
 
     _page: Page | None
+    _save_timer: int | None = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -54,7 +60,18 @@ class EditorView(Gtk.Box):
     def page(self, page: Page | None):
         self._page = page
 
+        # Stop the save timer
+        if self._save_timer:
+            GLib.source_remove(self._save_timer)
+            self._save_timer = None
+
+        if not page:
+            return
+
+        # Set the page content
         self._buffer.set_text(page.text)
+        # And start the save timer for automatic saving
+        self._save_timer = GLib.timeout_add_seconds(5, self._save_page)
 
     @Gtk.Template.Callback
     def _on_key_pressed(
@@ -65,3 +82,18 @@ class EditorView(Gtk.Box):
         state: Gdk.ModifierType,
     ) -> bool:
         return Gdk.EVENT_PROPAGATE
+
+    def do_hide(self):
+        logger.debug("Editor hidden")
+        super().do_hide()
+
+    def _get_text(self):
+        return self._buffer.get_text(
+            self._buffer.get_start_iter(), self._buffer.get_end_iter(), False
+        ).strip()
+
+    def _save_page(self):
+        logger.debug("Saving page: {}", self._page)
+        self._page.text = self._get_text()
+        self.emit("save-page", self._page)
+        return True

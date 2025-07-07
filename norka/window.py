@@ -90,7 +90,7 @@ class NorkaWindow(Adw.ApplicationWindow):
             "win.workspace-deactivate", None, self._on_workspace_deactivate
         )
         self.get_application().set_accels_for_action(
-            "win.workspace-deactivate", ["<ctrl>w"]
+            "win.workspace-deactivate", ["<ctrl><shift>w"]
         )
 
         self.install_action("win.notify", "s", self._on_notify_action)

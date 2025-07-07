@@ -27,7 +27,7 @@ from gettext import gettext as _
 from gi.repository import Adw, GLib, GObject, Gtk
 from loguru import logger
 
-from norka.models import Workspace
+from norka.models import Page, Workspace
 from norka.services import PageService, WorkspaceService
 from norka.widgets.content_view import ContentView
 from norka.widgets.sidebar import Sidebar
@@ -39,6 +39,7 @@ class ContentPage(Adw.BreakpointBin):
 
     _workspace: Workspace | None = None
 
+    split_view: Adw.OverlaySplitView = Gtk.Template.Child()
     sidebar_container: Adw.NavigationPage = Gtk.Template.Child()
     sidebar: Sidebar = Gtk.Template.Child()
     content_view: ContentView = Gtk.Template.Child()
@@ -49,9 +50,21 @@ class ContentPage(Adw.BreakpointBin):
         self._workspace_service = WorkspaceService.get_default()
         self._page_service = PageService.get_default()
 
-        self.install_action("win.create-page", None, self._on_create_page_action)
+        self.content_view.connect("save-page", self._on_save_page)
 
+        self.split_view.bind_property(
+            "show-sidebar",
+            self.content_view.toggle_sidebar_btn,
+            "visible",
+            GObject.BindingFlags.INVERT_BOOLEAN,
+        )
+
+        self.install_action("win.toggle-sidebar", None, self._on_toggle_sidebar_action)
+        self.install_action("win.create-page", None, self._on_create_page_action)
         self.install_action("win.open-page", "s", self._on_open_page_action)
+
+        if self.split_view.get_show_sidebar():
+            self.content_view.toggle_sidebar_btn.set_visible(False)
 
     @GObject.Property
     def workspace(self) -> Workspace | None:
@@ -61,10 +74,16 @@ class ContentPage(Adw.BreakpointBin):
     def workspace(self, workspace: Workspace):
         self._workspace = workspace
         if not workspace:
+            # Deactivate all actions and workers
+            self.content_view.close_page()
             return
 
         self.sidebar_container.set_title(self._workspace.name_with_icon)
         self.sidebar.workspace = workspace
+
+    def _on_toggle_sidebar_action(self, sender: Gtk.Widget, action: str, args=None):
+        logger.debug("Toggle sidebar action activated")
+        self.split_view.set_show_sidebar(True)
 
     def _on_create_page_action(self, sender: Gtk.Widget, action: str, args=None):
         logger.debug("New page action activated")
@@ -86,4 +105,20 @@ class ContentPage(Adw.BreakpointBin):
         if page := self._page_service.get_page(page_id):
             self.content_view.open_page(page)
 
+        return False
+
+    def _on_save_page(self, _sender, page: Page):
+        logger.debug("Saving page: {}", page.text)
+        GLib.idle_add(self._save_page_async, page)
+        return False
+
+    def _save_page_async(self, page: Page):
+        self._page_service.update_page(
+            page.id,
+            page.title,
+            page.text,
+            page.icon,
+            page.cover,
+        )
+        # Remove source from Loop
         return False

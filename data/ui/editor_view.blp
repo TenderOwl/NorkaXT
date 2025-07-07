@@ -15,14 +15,16 @@ template $EditorView : Box {
       GtkSource.View text_view {
         left-margin: 32;
         right-margin: 32;
-        top-margin: 12;
-        bottom-margin: 12;
+        top-margin: 24;
+        bottom-margin: 24;
         tab-width: 4;
         insert-spaces-instead-of-tabs: true;
         wrap-mode: word;
 
         margin-start: 8;
         margin-end: 8;
+        margin-top: 6;
+        margin-bottom: 6;
 
         EventControllerKey {
           propagation-phase: capture;
