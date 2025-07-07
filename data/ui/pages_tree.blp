@@ -14,7 +14,7 @@ template $PagesTree: Box {
       styles ["navigation-sidebar"]
 
       model: SingleSelection selection {
-        autoselect: false;
+        autoselect: true;
         selection-changed => $_on_selection_changed();
       };
 

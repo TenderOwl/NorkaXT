@@ -24,7 +24,7 @@
 
 from typing import Optional
 
-from gi.repository import Gio, GObject, Gtk
+from gi.repository import Gio, GObject, Gtk, Gdk
 from loguru import logger
 
 from norka.models import Page, PageNode, PageTreeItem
@@ -120,15 +120,19 @@ class PagesTree(Gtk.Box):
         return child_model
 
     def _on_item_setup(
-        self, _factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
+            self, _factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
     ):
         """
         Setup callback for list items. Creates the UI structure.
         """
-        list_item.set_child(PagesTreeRow())
+        child = PagesTreeRow()
+        ev_drag = Gtk.DragSource(actions=Gdk.DragAction.COPY)
+        ev_drag.connect('prepare', self._on_item_drag_prepare)
+        child.add_controller(ev_drag)
+        list_item.set_child(child)
 
     def _on_item_bind(
-        self, factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
+            self, factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
     ):
         """
         Bind callback for list items. Connects data to the UI.
@@ -154,6 +158,7 @@ class PagesTree(Gtk.Box):
         # Bind the data to the UI elements
         child.icon_label.set_text(page_tree_item.icon)
         child.title_label.set_text(page_tree_item.title)
+        child.item = page_tree_item
 
         # Add CSS classes for styling
         if page_tree_item.has_children:
@@ -162,7 +167,7 @@ class PagesTree(Gtk.Box):
             child.content_box.add_css_class("tree-item-leaf")
 
     def _on_item_unbind(
-        self, _factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
+            self, _factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
     ):
         """
         Unbind callback for list items. Clean up when items are recycled.
@@ -177,9 +182,25 @@ class PagesTree(Gtk.Box):
                 content_box.remove_css_class("tree-item-expandable")
                 content_box.remove_css_class("tree-item-leaf")
 
+    def _on_item_drag_prepare(self, ev_drag: Gtk.DragSource, x: int, y: int):
+        """
+        Handle drag prepare event.
+        """
+        try:
+            widget = ev_drag.get_widget()
+            item: PageTreeItem = widget.item
+            page = item.page_node.page
+            logger.debug("Dragging page: {}", page)
+            return Gdk.ContentProvider.new_for_value(page.id)
+
+        except Exception as e:
+            logger.error("Failed to set drag cursor: {}", e)
+
+        return None
+
     @Gtk.Template.Callback
     def _on_selection_changed(
-        self, selection: Gtk.SingleSelection, position: int, n_items: int
+            self, selection: Gtk.SingleSelection, position: int, n_items: int
     ):
         """
         Handle selection changes in the tree.
@@ -203,7 +224,7 @@ class PagesTree(Gtk.Box):
 
     @Gtk.Template.Callback
     def _on_mouse_enter(
-        self, controller: Gtk.EventControllerMotion, x: float, y: float
+            self, controller: Gtk.EventControllerMotion, x: float, y: float
     ):
         """Handle mouse enter events."""
         pass
@@ -215,7 +236,7 @@ class PagesTree(Gtk.Box):
 
     @Gtk.Template.Callback
     def _on_item_setup_template(
-        self, factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
+            self, factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
     ):
         """
         Template callback for item setup.
@@ -224,7 +245,7 @@ class PagesTree(Gtk.Box):
 
     @Gtk.Template.Callback
     def _on_item_bind_template(
-        self, factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
+            self, factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
     ):
         """
         Template callback for item binding.
@@ -302,3 +323,26 @@ class PagesTree(Gtk.Box):
             tree_list_row = self._tree_model.get_item(i)
             if tree_list_row and tree_list_row.get_expanded():
                 tree_list_row.set_expanded(False)
+
+    @Gtk.Template.Callback
+    def _on_dragsource_prepare(self, _drag_source: Gtk.DragSource, x: int, y: int):
+        """
+        Handle drag source prepare event.
+        """
+        self.dragged_item = self.selection.get_selected_item()
+        logger.debug("DnD Prepare with: {}", self.dragged_item)
+        if not self.dragged_item:
+            return False
+        return
+
+    @Gtk.Template.Callback
+    def _on_droptarget_enter(self, *args):
+        logger.debug("DropTarget enter: {}", args)
+
+    @Gtk.Template.Callback
+    def _on_droptarget_leave(self, *args):
+        logger.debug("DropTarget leave: {}", args)
+
+    @Gtk.Template.Callback
+    def _on_droptarget_async_drop(self, *args):
+        logger.debug("DropTarget async drop: {}", args)

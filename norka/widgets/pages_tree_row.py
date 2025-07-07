@@ -21,7 +21,10 @@
 # SOFTWARE.
 #
 # SPDX-License-Identifier: MIT
-from gi.repository import Gtk
+
+from gi.repository import Gtk, GObject
+
+from norka.models import PageTreeItem
 
 
 @Gtk.Template(resource_path="/com/tenderowl/norka/ui/pages_tree_row.ui")
@@ -31,6 +34,8 @@ class PagesTreeRow(Gtk.TreeExpander):
     content_box: Gtk.Box = Gtk.Template.Child()
     icon_label: Gtk.Label = Gtk.Template.Child()
     title_label: Gtk.Label = Gtk.Template.Child()
+
+    item: PageTreeItem = GObject.Property(type=GObject.TYPE_PYOBJECT)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
