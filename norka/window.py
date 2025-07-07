@@ -23,6 +23,7 @@
 # SPDX-License-Identifier: MIT
 
 from gi.repository import Adw, Gio, GLib, Gtk
+from gi.types import GObjectMeta
 from loguru import logger
 
 from norka.models import Workspace
@@ -85,8 +86,21 @@ class NorkaWindow(Adw.ApplicationWindow):
         GLib.idle_add(self._get_workspaces)
 
     def _install_actions(self):
-        self.install_action("win.workspace-deactivate", None, self._on_workspace_deactivate)
-        self.get_application().set_accels_for_action("win.workspace-deactivate", ["<ctrl>w"])
+        self.install_action(
+            "win.workspace-deactivate", None, self._on_workspace_deactivate
+        )
+        self.get_application().set_accels_for_action(
+            "win.workspace-deactivate", ["<ctrl>w"]
+        )
+
+        self.install_action("win.notify", "s", self._on_notify_action)
+
+    def _on_notify_action(
+        self, _sender: Gtk.Widget, _action: str, args: GLib.Variant = None
+    ):
+        logger.debug("Notify action activated")
+        if args:
+            self.add_toast(Adw.Toast.new(args.get_string()))
 
     def add_toast(self, toast: Adw.Toast):
         self.toast_overlay.add_toast(toast)

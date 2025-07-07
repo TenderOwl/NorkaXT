@@ -225,9 +225,15 @@ class PagesTree(Gtk.Box):
                 logger.debug("DropTarget files list: {}", drop)
             case str():
                 drop_widget = ev_drop.get_widget()
-                item: PageTreeItem = drop_widget.item.page_node
-                logger.debug("Move {} as c child of {}", drop, item)
-                PageService.get_default().move_page(drop, item.page.id)
+                page_node: PageTreeItem = drop_widget.item.page_node
+
+                if drop == page_node.page.id:
+                    logger.info("Cannot move a page to itself")
+                    self.activate_action("win.notify", GLib.Variant.new_string("Cannot move a page to itself"))
+                    return False
+
+                logger.debug("Move {} as c child of {}", drop, page_node)
+                PageService.get_default().move_page(drop, page_node.page.id)
 
         return True
 
