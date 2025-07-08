@@ -173,6 +173,7 @@ class PagesTree(Gtk.Box):
         child.item = page_tree_item
 
         # Add CSS classes for styling
+        child.expander.set_indent_for_icon(page_tree_item.props.has_children)
         if page_tree_item.has_children:
             child.add_css_class("tree-item-expandable")
         else:
