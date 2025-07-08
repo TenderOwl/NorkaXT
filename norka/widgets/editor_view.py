@@ -21,7 +21,7 @@
 # SOFTWARE.
 #
 # SPDX-License-Identifier: MIT
-from gi.repository import Gdk, GLib, GObject, Gtk, GtkSource, Adw
+from gi.repository import Adw, Gdk, GLib, GObject, Gtk, GtkSource, Pango
 from loguru import logger
 
 from norka.models import Page
@@ -51,6 +51,13 @@ class EditorView(Gtk.Box):
         self._buffer = GtkSource.Buffer()
         self._buffer.set_language(language)
         self.text_view.set_buffer(self._buffer)
+
+        self.tag_bold = self._buffer.create_tag("bold", weight=Pango.Weight.BOLD)
+        self.tag_italic = self._buffer.create_tag("italic", style=Pango.Style.ITALIC)
+        self.tag_underline = self._buffer.create_tag("underline", underline=Pango.Underline.SINGLE)
+        self.tag_found = self._buffer.create_tag("found", background="yellow")
+
+        self.install_action("editor.format", "s", self._on_format_action)
 
     @GObject.Property
     def page(self) -> Page | None:
@@ -102,7 +109,7 @@ class EditorView(Gtk.Box):
 
     def _get_text(self):
         return self._buffer.get_text(
-            self._buffer.get_start_iter(), self._buffer.get_end_iter(), False
+            self._buffer.get_start_iter(), self._buffer.get_end_iter(), True
         ).strip()
 
     def _save_page(self):
@@ -114,3 +121,13 @@ class EditorView(Gtk.Box):
     def do_grab_focus(self):
         self.text_view.grab_focus()
         return True
+
+    def _on_format_action(self, sender, action, tag_name: GLib.Variant):
+        logger.debug("{}: {}", action, tag_name.get_string())
+        self.apply_tag(tag_name.get_string())
+
+    def apply_tag(self, tag_name: str):
+        bounds = self._buffer.get_selection_bounds()
+        if len(bounds) != 0:
+            start, end = bounds
+            self._buffer.apply_tag_by_name(tag_name, start, end)
