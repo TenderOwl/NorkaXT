@@ -41,13 +41,15 @@ template $NorkaWindow: Adw.ApplicationWindow {
            }
 
           Overlay {
+            styles ["dots"]
+
             child: Box {
               halign: start;
               valign: end;
               margin-bottom: 24;
               width-request: 366;
               height-request: 256;
-              styles ["bglogo"]
+              // styles ["bglogo"]
             };
 
             [overlay]

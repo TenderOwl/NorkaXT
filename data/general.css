@@ -11,6 +11,13 @@
   opacity: 0.1;
 }
 
+.dots {
+  background: transparent;
+  background-image: radial-gradient(var(--headerbar-shade-color) 1px, transparent 0);
+  background-size: 16px 16px;
+  background-position: -19px -19px;
+}
+
 .workspace-card modelbutton:last-child {
   color: var(--error-color);
 }
