@@ -54,6 +54,7 @@ class ContentView(Adw.Bin):
 
         self.view_stack.set_visible_child_name(EDITOR_STACK_PAGE)
         self.editor_view.page = page
+        self.editor_view.grab_focus()
 
     def close_page(self):
         self.view_stack.set_visible_child_name(EMPTY_STACK_PAGE)

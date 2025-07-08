@@ -110,3 +110,7 @@ class EditorView(Gtk.Box):
         self._page.text = self._get_text()
         self.emit("save-page", self._page)
         return True
+
+    def do_grab_focus(self):
+        self.text_view.grab_focus()
+        return True
