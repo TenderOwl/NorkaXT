@@ -76,7 +76,7 @@ class EditorView(Gtk.Box):
             return
 
         # Set the page content
-        self._buffer.set_text(page.text)
+        self._buffer.set_text(page.text or "")
         # And start the save timer for automatic saving
         self._save_timer = GLib.timeout_add_seconds(5, self._save_page)
 
