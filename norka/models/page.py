@@ -26,7 +26,7 @@ from datetime import datetime
 from typing import List, Optional
 
 import nanoid
-from gi.repository import GObject, Gom, GLib
+from gi.repository import GLib, GObject, Gom
 from gi.types import GObjectMeta
 
 
@@ -58,6 +58,7 @@ class Page(Gom.Resource, metaclass=PageResourceMeta):
     title: str = GObject.Property(type=str)
     text: str | None = GObject.Property(type=str)
     content: GLib.Bytes | None = GObject.Property(type=GLib.Bytes)
+    tag_table: str | None = GObject.Property(type=str)
 
     # Visual properties
     icon: str | None = GObject.Property(type=str)
@@ -91,6 +92,8 @@ class Page(Gom.Resource, metaclass=PageResourceMeta):
 
         # Content
         self.text = kwargs.get("text", "")
+        self.content = kwargs.get("content", None)
+        self.tag_table = kwargs.get("tag_table", None)
 
         # Optional visual fields
         self.icon = kwargs.get("icon", None)
@@ -366,7 +369,9 @@ class Page(Gom.Resource, metaclass=PageResourceMeta):
         """Update the last accessed time."""
         self.last_accessed = int(datetime.now().timestamp())
 
-    def update_content(self, title: str = None, text: str = None):
+    def update_content(
+        self, title: str = None, text: str = None, tag_table: str = None
+    ):
         """
         Update page content.
 
@@ -378,6 +383,8 @@ class Page(Gom.Resource, metaclass=PageResourceMeta):
             self.title = title
         if text is not None:
             self.text = text
+        if tag_table is not None:
+            self.tag_table = tag_table
         self.updated_at = int(datetime.now().timestamp())
 
     def to_dict(self) -> dict:
@@ -397,7 +404,9 @@ class Page(Gom.Resource, metaclass=PageResourceMeta):
             "parent_page_id": self.parent_page_id,
             "created_at": self.created_at_dt.isoformat() if self.created_at else None,
             "updated_at": self.updated_at_dt.isoformat() if self.updated_at else None,
-            "last_accessed": self.last_accessed_dt.isoformat() if self.last_accessed else None,
+            "last_accessed": self.last_accessed_dt.isoformat()
+            if self.last_accessed
+            else None,
             "is_favorite": self.is_favorite,
             "is_archived": self.is_archived,
             "is_published": self.is_published,
@@ -417,12 +426,8 @@ class Page(Gom.Resource, metaclass=PageResourceMeta):
 
 
 # Register GObject signals
-GObject.signal_new(
-    "page-changed", Page, GObject.SignalFlags.DETAILED, None, (str,)
-)
+GObject.signal_new("page-changed", Page, GObject.SignalFlags.DETAILED, None, (str,))
 GObject.signal_new(
     "page-favorite-changed", Page, GObject.SignalFlags.RUN_FIRST, None, (bool,)
 )
-GObject.signal_new(
-    "page-accessed", Page, GObject.SignalFlags.RUN_FIRST, None, ()
-)
+GObject.signal_new("page-accessed", Page, GObject.SignalFlags.RUN_FIRST, None, ())

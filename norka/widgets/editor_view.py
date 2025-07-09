@@ -21,6 +21,9 @@
 # SOFTWARE.
 #
 # SPDX-License-Identifier: MIT
+import json
+from typing import Dict, Tuple, List
+
 from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk, GtkSource, Pango
 from loguru import logger
 
@@ -84,9 +87,9 @@ class EditorView(Gtk.Box):
             return
 
         # Set the page content
-        # self._buffer.set_text(page.text or "")
-        content = page.content.get_data().decode("utf-8")
-        self._buffer.set_text(content or "")
+        self._buffer.set_text(page.text or "")
+        self._apply_tags(json.loads(page.tag_table or "{}"))
+        logger.debug("Loaded page tag table: {}", json.loads(page.tag_table))
         # And start the save timer for automatic saving
         # self._save_timer = GLib.timeout_add_seconds(5, self._save_page)
         logger.info("Autosaving disabled")
@@ -103,6 +106,14 @@ class EditorView(Gtk.Box):
 
         scheme = style_scheme_manager.get_scheme(scheme_id)
         self._buffer.set_style_scheme(scheme)
+
+    def _apply_tags(self, tag_table: Dict[str, List[Tuple[int, int]]]) -> None:
+        tag_table = tag_table
+        for tag_name in tag_table:
+            for tag_range in tag_table[tag_name]:
+                start_iter = self._buffer.get_iter_at_offset(tag_range[0])
+                end_iter = self._buffer.get_iter_at_offset(tag_range[1])
+                self._buffer.apply_tag_by_name(tag_name, start_iter, end_iter)
 
     @Gtk.Template.Callback
     def _on_key_pressed(
@@ -151,19 +162,35 @@ class EditorView(Gtk.Box):
 
         logger.info("Begin saving page")
 
-        start, end = bounds
-        content = self._buffer.get_slice(start, end, True)
-        output_stream = Gio.MemoryOutputStream.new_resizable()
+        text_iter = self._buffer.get_start_iter()
+        # Tag table contains all tags applied to the text and their start and end positions
+        tag_table: Dict[str, Tuple[int, int]]() = {}
+        while text_iter.forward_to_tag_toggle():
+            # Get all tags toggled on the current position
+            # If the tag is not in the tag table, add it and set the start position
+            tags = text_iter.get_toggled_tags(toggled_on=True)
+            for tag in tags:
+                tag_name = tag.props.name
+                if tag_name not in tag_table:
+                    tag_table[tag_name] = []
 
-        logger.info("Call content_serialize_async()")
-        Gdk.content_serialize_async(
-            output_stream,
-            PAGE_MIME_TYPE,
-            content,
-            GLib.PRIORITY_DEFAULT,
-            None,
-            callback=self._save_page_callback,
-        )
+                tag_table[tag_name].append([text_iter.get_offset(), 0])
+
+            # Get all tags toggled off the current position
+            # If the tag is in the tag table, set the end position
+            tags = text_iter.get_toggled_tags(toggled_on=False)
+            for tag in tags:
+                tag_name = tag.props.name
+                if tag_name in tag_table:
+                    if tag_ranges:= tag_table[tag_name]:
+                        tag_ranges[-1][1] = text_iter.get_offset()
+                        tag_table[tag_name] = tag_ranges
+
+        logger.info("Tag table: {}", tag_table)
+
+        self._page.tag_table = json.dumps(tag_table)
+        self._page.text = self._get_text()
+        self.emit("save-page", self._page)
 
     def _save_page_callback(
         self, result: Gio.AsyncResult, serializer: Gdk.ContentSerializer

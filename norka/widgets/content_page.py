@@ -117,7 +117,7 @@ class ContentPage(Adw.BreakpointBin):
             page.id,
             page.title,
             page.text,
-            page.content,
+            page.tag_table,
             page.icon,
             page.cover,
         )

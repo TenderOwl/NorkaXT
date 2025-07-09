@@ -133,7 +133,7 @@ class PageService(GObject.Object):
         page_id: str,
         title: str = None,
         text: str = None,
-        content: bytes = None,
+        tag_table: str = None,
         icon: str = None,
         cover: str = None,
     ) -> Optional[Page]:
@@ -144,6 +144,7 @@ class PageService(GObject.Object):
             page_id: Page ID
             title: New title (optional)
             text: New text content (optional)
+            tag_table: Tag table in bytes
             icon: New icon (optional)
             cover: New cover (optional)
 
@@ -162,10 +163,10 @@ class PageService(GObject.Object):
             page.icon = icon
         if cover is not None:
             page.cover = cover
-        if content is not None:
-            page.content = content
+        if tag_table is not None:
+            page.tag_table = tag_table
 
-        page.update_content(title, text)
+        page.update_content(title, text, tag_table)
         page.save_sync()
         self.emit("page-updated", page)
         return page
