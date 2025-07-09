@@ -133,6 +133,7 @@ class PageService(GObject.Object):
         page_id: str,
         title: str = None,
         text: str = None,
+        content: bytes = None,
         icon: str = None,
         cover: str = None,
     ) -> Optional[Page]:
@@ -161,6 +162,8 @@ class PageService(GObject.Object):
             page.icon = icon
         if cover is not None:
             page.cover = cover
+        if content is not None:
+            page.content = content
 
         page.update_content(title, text)
         page.save_sync()

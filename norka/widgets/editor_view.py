@@ -21,10 +21,12 @@
 # SOFTWARE.
 #
 # SPDX-License-Identifier: MIT
-from gi.repository import Adw, Gdk, GLib, GObject, Gtk, GtkSource, Pango
+from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk, GtkSource, Pango
 from loguru import logger
 
 from norka.models import Page
+
+PAGE_MIME_TYPE = "application/octet-stream"
 
 
 @Gtk.Template(resource_path="/com/tenderowl/norka/ui/editor_view.ui")
@@ -54,8 +56,14 @@ class EditorView(Gtk.Box):
 
         self.tag_bold = self._buffer.create_tag("bold", weight=Pango.Weight.BOLD)
         self.tag_italic = self._buffer.create_tag("italic", style=Pango.Style.ITALIC)
-        self.tag_underline = self._buffer.create_tag("underline", underline=Pango.Underline.SINGLE)
+        self.tag_underline = self._buffer.create_tag(
+            "underline", underline=Pango.Underline.SINGLE
+        )
         self.tag_found = self._buffer.create_tag("found", background="yellow")
+
+        Gdk.content_register_serializer(
+            GLib.Bytes, PAGE_MIME_TYPE, self._serialize_text_buffer
+        )
 
         self.install_action("editor.format", "s", self._on_format_action)
 
@@ -76,9 +84,12 @@ class EditorView(Gtk.Box):
             return
 
         # Set the page content
-        self._buffer.set_text(page.text or "")
+        # self._buffer.set_text(page.text or "")
+        content = page.content.get_data().decode("utf-8")
+        self._buffer.set_text(content or "")
         # And start the save timer for automatic saving
-        self._save_timer = GLib.timeout_add_seconds(5, self._save_page)
+        # self._save_timer = GLib.timeout_add_seconds(5, self._save_page)
+        logger.info("Autosaving disabled")
 
         self._apply_styling()
 
@@ -131,3 +142,64 @@ class EditorView(Gtk.Box):
         if len(bounds) != 0:
             start, end = bounds
             self._buffer.apply_tag_by_name(tag_name, start, end)
+
+    @Gtk.Template.Callback()
+    def _on_button_save_clicked(self, button):
+        bounds = self._buffer.get_bounds()
+        if len(bounds) == 0:
+            return
+
+        logger.info("Begin saving page")
+
+        start, end = bounds
+        content = self._buffer.get_slice(start, end, True)
+        output_stream = Gio.MemoryOutputStream.new_resizable()
+
+        logger.info("Call content_serialize_async()")
+        Gdk.content_serialize_async(
+            output_stream,
+            PAGE_MIME_TYPE,
+            content,
+            GLib.PRIORITY_DEFAULT,
+            None,
+            callback=self._save_page_callback,
+        )
+
+    def _save_page_callback(
+        self, result: Gio.AsyncResult, serializer: Gdk.ContentSerializer
+    ):
+        logger.info("Call _save_page_callback()")
+        output_stream: Gio.MemoryOutputStream = serializer.get_output_stream()
+        value = serializer.get_value()
+
+        try:
+            value = GLib.Bytes.new(value.encode("utf-8"))
+            output_stream.write(value.get_data())
+            output_stream.close()
+            self._page.content = output_stream.steal_as_bytes()
+
+            self.emit("save-page", self._page)
+        except Exception as e:
+            logger.error("Failed to serialize page: {}", e)
+            serializer.return_error(e)
+
+        # logger.info("Call content_serialize_finish() with result: {}", result)
+        # if success := Gdk.content_serialize_finish(result):
+        #     logger.info("Saved page: {}", success)
+        # else:
+        #     logger.info("Failed to save page async: {}", result)
+
+    def _serialize_text_buffer(self, serializer: Gdk.ContentSerializer):
+        output_stream = serializer.get_output_stream()
+        value = serializer.get_value()
+
+        logger.info("Serializing page: {}", value)
+
+        try:
+            value = GLib.Bytes.new(value.encode("utf-8"))
+            output_stream.write(value.get_data())
+
+            serializer.return_success()
+        except Exception as e:
+            logger.error("Failed to serialize page: {}", e)
+            serializer.return_error(e)

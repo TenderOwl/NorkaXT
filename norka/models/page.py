@@ -26,7 +26,7 @@ from datetime import datetime
 from typing import List, Optional
 
 import nanoid
-from gi.repository import GObject, Gom
+from gi.repository import GObject, Gom, GLib
 from gi.types import GObjectMeta
 
 
@@ -57,6 +57,7 @@ class Page(Gom.Resource, metaclass=PageResourceMeta):
     # Page content
     title: str = GObject.Property(type=str)
     text: str | None = GObject.Property(type=str)
+    content: GLib.Bytes | None = GObject.Property(type=GLib.Bytes)
 
     # Visual properties
     icon: str | None = GObject.Property(type=str)

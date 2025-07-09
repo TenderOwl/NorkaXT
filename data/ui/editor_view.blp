@@ -5,8 +5,6 @@ using GtkSource 5;
 template $EditorView : Box {
   orientation: vertical;
 
-  Adw.ToolbarView {
-    [bottom]
     Box {
       margin-end: 6;
       margin-top: 6;
@@ -18,24 +16,34 @@ template $EditorView : Box {
         maximum-size: 1000;
 
         Box {
-          styles ["linked"]
+          spacing: 6;
 
-          Button btn_bold {
-            icon-name: "format-text-bold-symbolic";
-            action-name: "editor.format";
-            action-target: "'bold'";
+          Box {
+            Button btn_bold {
+              icon-name: "format-text-bold-symbolic";
+              action-name: "editor.format";
+              action-target: "'bold'";
+            }
+
+            Button button_italic {
+              icon-name: "format-text-italic-symbolic";
+              action-name: "editor.format";
+              action-target: "'italic'";
+            }
+
+            Button button_underline {
+              icon-name: "format-text-underline-symbolic";
+              action-name: "editor.format";
+              action-target: "'underline'";
+            }
+
+            styles ["linked"]
           }
 
-          Button button_italic {
-            icon-name: "format-text-italic-symbolic";
-            action-name: "editor.format";
-            action-target: "'italic'";
-          }
-
-          Button button_underline {
-            icon-name: "format-text-underline-symbolic";
-            action-name: "editor.format";
-            action-target: "'underline'";
+          Button {
+            name: "save-button";
+            icon-name: "document-save-symbolic";
+            clicked => $_on_button_save_clicked();
           }
         }
       }
@@ -73,5 +81,4 @@ template $EditorView : Box {
     }
 
     styles ["editor"]
-  }
 }
