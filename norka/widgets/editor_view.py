@@ -41,7 +41,7 @@ class EditorView(Gtk.Box):
     }
 
     text_view: GtkSource.View = Gtk.Template.Child()
-    _buffer: GtkSource.Buffer
+    _buffer: GtkSource.Buffer = Gtk.Template.Child(name="buffer")
     # completion: GtkSource.Completion = Gtk.Template.Child()
 
     _page: Page | None
@@ -53,9 +53,7 @@ class EditorView(Gtk.Box):
         language_manager = GtkSource.LanguageManager.get_default()
         language = language_manager.get_language("markdown")
 
-        self._buffer = GtkSource.Buffer()
         self._buffer.set_language(language)
-        self.text_view.set_buffer(self._buffer)
 
         self.tag_bold = self._buffer.create_tag("bold", weight=Pango.Weight.BOLD)
         self.tag_italic = self._buffer.create_tag("italic", style=Pango.Style.ITALIC)
@@ -63,10 +61,6 @@ class EditorView(Gtk.Box):
             "underline", underline=Pango.Underline.SINGLE
         )
         self.tag_found = self._buffer.create_tag("found", background="yellow")
-
-        Gdk.content_register_serializer(
-            GLib.Bytes, PAGE_MIME_TYPE, self._serialize_text_buffer
-        )
 
         self.install_action("editor.format", "s", self._on_format_action)
 
@@ -108,6 +102,13 @@ class EditorView(Gtk.Box):
         self._buffer.set_style_scheme(scheme)
 
     def _apply_tags(self, tag_table: Dict[str, List[Tuple[int, int]]]) -> None:
+        """
+        Applies tags to the editor view buffer from a tag table.
+
+        :param tag_table: A dictionary of tag names to lists of tag ranges.
+            Each tag range is a tuple of two integers representing the start
+            and end offsets of the tag in the buffer.
+        """
         tag_table = tag_table
         for tag_name in tag_table:
             for tag_range in tag_table[tag_name]:
@@ -191,42 +192,3 @@ class EditorView(Gtk.Box):
         self._page.tag_table = json.dumps(tag_table)
         self._page.text = self._get_text()
         self.emit("save-page", self._page)
-
-    def _save_page_callback(
-        self, result: Gio.AsyncResult, serializer: Gdk.ContentSerializer
-    ):
-        logger.info("Call _save_page_callback()")
-        output_stream: Gio.MemoryOutputStream = serializer.get_output_stream()
-        value = serializer.get_value()
-
-        try:
-            value = GLib.Bytes.new(value.encode("utf-8"))
-            output_stream.write(value.get_data())
-            output_stream.close()
-            self._page.content = output_stream.steal_as_bytes()
-
-            self.emit("save-page", self._page)
-        except Exception as e:
-            logger.error("Failed to serialize page: {}", e)
-            serializer.return_error(e)
-
-        # logger.info("Call content_serialize_finish() with result: {}", result)
-        # if success := Gdk.content_serialize_finish(result):
-        #     logger.info("Saved page: {}", success)
-        # else:
-        #     logger.info("Failed to save page async: {}", result)
-
-    def _serialize_text_buffer(self, serializer: Gdk.ContentSerializer):
-        output_stream = serializer.get_output_stream()
-        value = serializer.get_value()
-
-        logger.info("Serializing page: {}", value)
-
-        try:
-            value = GLib.Bytes.new(value.encode("utf-8"))
-            output_stream.write(value.get_data())
-
-            serializer.return_success()
-        except Exception as e:
-            logger.error("Failed to serialize page: {}", e)
-            serializer.return_error(e)

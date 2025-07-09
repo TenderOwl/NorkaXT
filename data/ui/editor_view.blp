@@ -2,86 +2,102 @@ using Gtk 4.0;
 using Adw 1;
 using GtkSource 5;
 
-template $EditorView : Box {
+template $EditorView: Box {
   orientation: vertical;
 
-    Box {
-      margin-end: 6;
-      margin-top: 6;
-      margin-start: 6;
-      margin-bottom: 6;
-      styles ["toolbar"]
+  Box {
+    margin-end: 6;
+    margin-top: 6;
+    margin-start: 6;
+    margin-bottom: 6;
 
-       Adw.Clamp {
-        maximum-size: 1000;
-        hexpand: true;
-        margin-start: 12;
-        margin-end: 12;
+    styles [
+      "toolbar",
+    ]
+
+    Adw.Clamp {
+      maximum-size: 1000;
+      hexpand: true;
+      margin-start: 12;
+      margin-end: 12;
+
+      Box {
+        spacing: 6;
 
         Box {
-          spacing: 6;
-
-          Box {
-            Button btn_bold {
-              icon-name: "format-text-bold-symbolic";
-              action-name: "editor.format";
-              action-target: "'bold'";
-            }
-
-            Button button_italic {
-              icon-name: "format-text-italic-symbolic";
-              action-name: "editor.format";
-              action-target: "'italic'";
-            }
-
-            Button button_underline {
-              icon-name: "format-text-underline-symbolic";
-              action-name: "editor.format";
-              action-target: "'underline'";
-            }
-
-            styles ["linked"]
+          Button btn_bold {
+            icon-name: "format-text-bold-symbolic";
+            action-name: "editor.format";
+            action-target: "'bold'";
           }
 
-          Button {
-            name: "save-button";
-            icon-name: "document-save-symbolic";
-            clicked => $_on_button_save_clicked();
+          Button button_italic {
+            icon-name: "format-text-italic-symbolic";
+            action-name: "editor.format";
+            action-target: "'italic'";
           }
+
+          Button button_underline {
+            icon-name: "format-text-underline-symbolic";
+            action-name: "editor.format";
+            action-target: "'underline'";
+          }
+
+          Button button_strikethrough {
+            icon-name: "format-text-strikethrough-symbolic";
+            action-name: "editor.format";
+            action-target: "'strikethrough'";
+          }
+
+          styles [
+            "linked",
+          ]
+        }
+
+        Button {
+          name: "save-button";
+          icon-name: "document-save-symbolic";
+          clicked => $_on_button_save_clicked();
         }
       }
     }
+  }
 
-    ScrolledWindow {
-      vexpand: true;
-      hexpand: true;
+  ScrolledWindow {
+    vexpand: true;
+    hexpand: true;
 
-      Adw.ClampScrollable {
-        maximum-size: 1000;
+    Adw.ClampScrollable {
+      maximum-size: 1000;
 
-        GtkSource.View text_view {
-          left-margin: 32;
-          right-margin: 32;
-          top-margin: 24;
-          bottom-margin: 24;
-          tab-width: 4;
-          insert-spaces-instead-of-tabs: true;
-          wrap-mode: word;
+      GtkSource.View text_view {
+        buffer: GtkSource.Buffer buffer {};
 
-          margin-start: 8;
-          margin-end: 8;
-          margin-top: 6;
-          margin-bottom: 6;
+        left-margin: 32;
+        right-margin: 32;
+        top-margin: 24;
+        bottom-margin: 24;
+        tab-width: 4;
+        insert-spaces-instead-of-tabs: true;
+        wrap-mode: word;
+        margin-start: 8;
+        margin-end: 8;
+        margin-top: 6;
+        margin-bottom: 6;
 
-          EventControllerKey {
-            propagation-phase: capture;
-            key-pressed => $_on_key_pressed();
-          }
-
-          styles ["editor-view"]
+        EventControllerKey {
+          propagation-phase: capture;
+          key-pressed => $_on_key_pressed();
         }
+
+        styles [
+          "editor-view",
+        ]
       }
     }
+  }
 
-    styles ["editor"]
+  styles [
+    "editor",
+  ]
 }
