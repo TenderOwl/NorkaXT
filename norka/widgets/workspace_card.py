@@ -59,7 +59,6 @@ class WorkspaceCard(Gtk.Box):
 
         self.popover = Gtk.PopoverMenu(position=Gtk.PositionType.RIGHT)
         self.popover.set_parent(self)
-        self.popover.add_child(Gtk.Label(label="Edit Workspace"), "edit-workspace")
 
         if workspace:
             self._bind_workspace(workspace)

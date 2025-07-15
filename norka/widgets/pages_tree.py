@@ -24,11 +24,11 @@
 
 from typing import Optional
 
-from gi.repository import Gio, GObject, Gtk, Gdk, GLib
+from gi.repository import Gdk, Gio, GLib, GObject, Gtk
 from loguru import logger
 
 from norka.models import Page, PageNode, PageTreeItem
-from norka.services import WorkspaceService, PageService
+from norka.services import PageService
 from norka.widgets.pages_tree_row import PagesTreeRow
 
 
@@ -57,6 +57,12 @@ class PagesTree(Gtk.Box):
         self.selection.connect("selection-changed", self._on_selection_changed)
 
         self.list_view.add_css_class("navigation-sidebar")
+
+        self.install_action("page.add-page", "s", self._on_page_add_page)
+        self.install_action("page.rename", "s", self._on_page_rename)
+        self.install_action("page.duplicate", "s", self._on_page_duplicate)
+        self.install_action("page.change-workspace", "s", self._on_page_change_workspace)
+        self.install_action("page.delete", "s", self._on_page_delete)
 
     def populate_tree(self, page_nodes: list[PageNode]):
         """
@@ -406,3 +412,22 @@ class PagesTree(Gtk.Box):
     @Gtk.Template.Callback
     def _on_droptarget_async_drop(self, *args):
         logger.debug("DropTarget async drop: {}", args)
+
+    ### Page context actions ###
+
+    def _on_page_add_page(self, sender, action: str, page_id: GLib.Variant):
+        logger.debug("{}: {}", action, page_id.get_string())
+
+    def _on_page_duplicate(self, sender, action: str, page_id: GLib.Variant):
+        logger.debug("{}: {}", action, page_id.get_string())
+
+    def _on_page_rename(self, sender, action: str, page_id: GLib.Variant):
+        logger.debug("{}: {}", action, page_id.get_string())
+
+    def _on_page_change_workspace(self, sender, action: str, page_id: GLib.Variant):
+        logger.debug("{}: {}", action, page_id.get_string())
+
+    def _on_page_delete(self, sender, action: str, page_id: GLib.Variant):
+        logger.debug("{}: {}", action, page_id.get_string())
+
+    ### End of Page context actions ###

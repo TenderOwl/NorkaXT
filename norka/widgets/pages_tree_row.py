@@ -22,7 +22,9 @@
 #
 # SPDX-License-Identifier: MIT
 
-from gi.repository import Gtk, GObject
+from gettext import gettext as _
+
+from gi.repository import Gio, GObject, Gtk
 
 from norka.models import PageTreeItem
 
@@ -38,5 +40,59 @@ class PagesTreeRow(Gtk.Box):
 
     item: PageTreeItem = GObject.Property(type=GObject.TYPE_PYOBJECT)
 
+    popover: Gtk.PopoverMenu
+    _edit_menu: Gio.Menu | None
+    _menu_subpages: Gio.MenuItem
+    _menu_rename: Gio.MenuItem
+    _menu_duplicate: Gio.MenuItem
+    _menu_move: Gio.MenuItem
+    _menu_delete: Gio.MenuItem
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        self.popover = Gtk.PopoverMenu(position=Gtk.PositionType.RIGHT)
+        self.popover.set_parent(self)
+
+    def build_menu(self):
+        self._edit_menu = Gio.Menu.new()
+        self._edit_menu.append_item(
+            Gio.MenuItem.new(
+                _("New Subpage"),
+                detailed_action=f"page.add-page('{self.item.page_node.page.id}')",
+            )
+        )
+        self._edit_menu.append_item(
+            Gio.MenuItem.new(
+                _("Rename"),
+                detailed_action=f"page.rename('{self.item.page_node.page.id}')",
+            )
+        )
+        self._edit_menu.append_item(
+            Gio.MenuItem.new(
+                _("Duplicate"),
+                detailed_action=f"page.duplicate('{self.item.page_node.page.id}')",
+            )
+        )
+
+        self._edit_menu.append_item(
+            Gio.MenuItem.new(
+                _("Move to Workspace"),
+                detailed_action=f"page.change-workspace('{self.item.page_node.page.id}')",
+            )
+        )
+        self._menu_delete = Gio.MenuItem.new(
+            _("Delete"),
+            detailed_action=f"page.delete('{self.item.page_node.page.id}')",
+        )
+
+        delete_section = Gio.Menu()
+        delete_section.append_item(self._menu_delete)
+        self._edit_menu.append_section(None, delete_section)
+        self.popover.set_menu_model(self._edit_menu)
+
+    @Gtk.Template.Callback()
+    def _on_context_menu(self, controller, button, x, y):
+        if self.item:
+            self.build_menu()
+        self.popover.popup()

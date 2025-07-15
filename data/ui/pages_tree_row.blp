@@ -5,6 +5,8 @@ template $PagesTreeRow: Box {
     // margin-top: 3;
     // margin-bottom: 3;
 
+    styles ["pages-tree-row"]
+
     TreeExpander expander {}
 
     Label icon_label {
@@ -17,6 +19,11 @@ template $PagesTreeRow: Box {
       hexpand: true;
       xalign: 0.0;
       ellipsize: end;
+    }
+
+    GestureClick {
+      button: 3;
+      pressed => $_on_context_menu();
     }
   }
 
