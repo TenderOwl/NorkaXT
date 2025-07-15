@@ -83,6 +83,10 @@ class NorkaApplication(Adw.Application):
                 display, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
             )
 
+            Gtk.IconTheme.get_for_display(display).add_resource_path(
+                "/com/tenderowl/norka/icons"
+            )
+
     def on_about_action(self, *args):
         """Callback for the app.about action."""
         about = Adw.AboutDialog(

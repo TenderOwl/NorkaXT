@@ -14,9 +14,18 @@
         <file preprocess="xml-stripblanks">ui/content_page.ui</file>
         <file preprocess="xml-stripblanks">ui/content_view.ui</file>
         <file preprocess="xml-stripblanks">ui/editor_view.ui</file>
+        <file preprocess="xml-stripblanks">ui/editor_actions_popover.ui</file>
     </gresource>
     <gresource prefix="/com/tenderowl/norka/icons">
         <file alias="otter.png">icons/otter.png</file>
+        <file compressed="true" preprocess="xml-stripblanks" alias="format-bold-symbolic.svg">icons/scalable/actions/format-bold-symbolic.svg</file>
+        <file compressed="true" preprocess="xml-stripblanks" alias="format-format-clear-symbolic.svg">icons/scalable/actions/format-format-clear-symbolic.svg</file>
+        <file compressed="true" preprocess="xml-stripblanks" alias="format-h-1-symbolic.svg">icons/scalable/actions/format-h-1-symbolic.svg</file>
+        <file compressed="true" preprocess="xml-stripblanks" alias="format-h-2-symbolic.svg">icons/scalable/actions/format-h-2-symbolic.svg</file>
+        <file compressed="true" preprocess="xml-stripblanks" alias="format-h-3-symbolic.svg">icons/scalable/actions/format-h-3-symbolic.svg</file>
+        <file compressed="true" preprocess="xml-stripblanks" alias="format-italic-symbolic.svg">icons/scalable/actions/format-italic-symbolic.svg</file>
+        <file compressed="true" preprocess="xml-stripblanks" alias="format-strikethrough-symbolic.svg">icons/scalable/actions/format-strikethrough-symbolic.svg</file>
+        <file compressed="true" preprocess="xml-stripblanks" alias="format-underline-symbolic.svg">icons/scalable/actions/format-underline-symbolic.svg</file>
     </gresource>
     <gresource prefix="/com/tenderowl/norka/covers">
         <file alias="cover-1">covers/cover-1.jpg</file>

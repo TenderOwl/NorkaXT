@@ -1,0 +1,71 @@
+using Gtk 4.0;
+
+template $EditorActionsPopover: Popover {
+  position: top;
+  autohide: true;
+
+  child: Box {
+    spacing: 6;
+
+    Box {
+      Button {
+        icon-name: "format-bold-symbolic";
+        action-name: "editor.format";
+        action-target: "'bold'";
+      }
+
+      Button {
+        icon-name: "format-italic-symbolic";
+        action-name: "editor.format";
+        action-target: "'italic'";
+      }
+
+      Button {
+        icon-name: "format-underline-symbolic";
+        action-name: "editor.format";
+        action-target: "'underline'";
+      }
+
+      Button {
+        icon-name: "format-strikethrough-symbolic";
+        action-name: "editor.format";
+        action-target: "'strikethrough'";
+      }
+
+      styles [
+        "linked",
+      ]
+    }
+
+    Box {
+     Button {
+      icon-name: "format-h-1-symbolic";
+      action-name: "editor.heading1";
+      // action-target: "'strikethrough'";
+      }
+       Button {
+        icon-name: "format-h-2-symbolic";
+        action-name: "editor.heading2";
+        // action-target: "'strikethrough'";
+      }
+
+      Button {
+        icon-name: "format-h-3-symbolic";
+        action-name: "editor.heading3";
+        // action-target: "'strikethrough'";
+      }
+
+     styles ["linked"]
+    }
+
+    Box {
+     Button {
+      icon-name: "format-format-clear-symbolic";
+      action-name: "editor.heading1";
+      // action-target: "'strikethrough'";
+      }
+
+     styles ["linked"]
+    }
+  };
+}
